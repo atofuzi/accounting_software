@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'accounting_software'),
+    'name' => env('APP_NAME', 'SAO'),
 
     /*
     |--------------------------------------------------------------------------
@@ -93,8 +93,8 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
-
+    //'fallback_locale' => 'en',
+    'fallback_locale' => 'ja',
     /*
     |--------------------------------------------------------------------------
     | Faker Locale

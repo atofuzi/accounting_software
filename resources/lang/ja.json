@@ -1,0 +1,13 @@
+{
+    "Dashboard": "ダッシュボード",
+    "Debit" : "借方",
+    "Credit" : "貸方",
+    "Date" : "日付",
+    "Account_date" : "会計日",
+    "Summary" : "摘要",
+    "Amount" : "金額",
+    "journal" : "仕分",
+    "Account_subject" : "会計科目",
+    "Gentian_number" : "元丁",
+    "Journal" : "仕訳帳"
+}
