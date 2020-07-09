@@ -16,27 +16,44 @@ class JournalController extends Controller
     public function create(Request $request)
     {
 
+        $account_subject_id = $request->debit_account_subject_id;
+        $account_subject = AccountSubjectTable::get($account_subject_id);
         
-        $data = $request->account_date;
-        (int)$account_subject_id = $request->debit_account_subject_id;
+        DB::table('sessions')->insert([
+            'amount' => $request->debit_amount,
+            'account_month' => 7,
+            'account_subject_id' => $account_subject_id,
+            'account_date' => $request->account_date,
+            'gentian_number' => $request->debit_gentian_number, 
 
-        DB::insert('insert into sessions (account_month, account_date, account_subject_id, gentian_number, amount) values (7,2020-07-08,1,20,10000)');
-
-        session(['account_month' => 7]);
-        session(['account_date' => $data ]);
-        session(['account_subject_id ' => $account_subject_id ]);
-        session(['summary' => $request->debit_summary ]);
-        session(['gentian_number' => $request->debit_gentian_number]);
-        session(['bank_id' => 1]);
-        session(['amount' => $request->debit_amount]);
-        session(['ledgers_id' => 1 ]);
-        session(['journal_flg' => 0]);
-        session(['created_at' => Carbon::now() ]);
-        session(['updated_at' => Carbon::now() ]);
-
-
+        ]);
 
         return view('journal');
 
+    }
+}
+
+class AccountSubjectTable
+{
+    public static $account_subjects = [
+        '現金' => 1,
+        '普通預金' => 2,
+        '売掛金' => 3,
+        '事業主貸' => 4,
+        '買掛金' => 5,
+        '借入金' => 6,
+        '未払費用' => 7,
+        '預かり金' => 8,
+        '事業主借' => 9,
+        '元入金' => 10,
+        '売上' => 11,
+        '経費' => 12,
+        '雑収入' => 13,
+    ];
+    
+    public static function get($id){
+        $account_subjects = self::$account_subjects;
+        $account_subject = array_search($id,$account_subjects);
+        return $account_subject;
     }
 }
