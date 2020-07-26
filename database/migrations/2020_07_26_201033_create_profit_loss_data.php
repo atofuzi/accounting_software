@@ -17,6 +17,7 @@ class CreateProfitLossData extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('sales_amount')->default(0);
+            $table->integer('miscellaneous_income')->default(0);
             $table->integer('purchase_amount')->default(0);
             $table->integer('tax_public_dues')->default(0);
             $table->integer('packing_freight')->default(0);
@@ -37,6 +38,7 @@ class CreateProfitLossData extends Migration
             $table->integer('bad_debt')->default(0);
             $table->integer('software_usage_fee')->default(0);
             $table->integer('newspaper_book_fee')->default(0);
+            $table->integer('meeting_fee')->default(0);
             $table->integer('miscellaneous_expenses')->default(0);
             $table->timestamps();
         });
