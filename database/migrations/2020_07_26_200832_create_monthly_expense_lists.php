@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountSubjectsTable extends Migration
+class CreateMonthlyExpenseLists extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateAccountSubjectsTable extends Migration
      */
     public function up()
     {
-        Schema::create('account_subjects', function (Blueprint $table) {
+        Schema::create('monthly_expense_lists', function (Blueprint $table) {
             $table->id();
-            $table->text('account_subject');
-            $table->text('key_name');
-            $table->text('bs_pl_type');
-            $table->text('bs_type_small')->default("");
+            $table->integer('user_id');
+            $table->text('expense_name');
+            $table->text('claim_tate');
+            $table->text('payment_date');
+            $table->text('payment_method');
             $table->timestamps();
         });
     }
@@ -30,6 +31,6 @@ class CreateAccountSubjectsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('account_subjects');
+        Schema::dropIfExists('monthly_expense_lists');
     }
 }

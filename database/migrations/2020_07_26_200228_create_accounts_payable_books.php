@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountsReceivablesTable extends Migration
+class CreateAccountsPayableBooks extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateAccountsReceivablesTable extends Migration
      */
     public function up()
     {
-        Schema::create('accounts_receivables', function (Blueprint $table) {
+        Schema::create('accounts_payable_books', function (Blueprint $table) {
             $table->id();
-            $table->text('receivable');
+            $table->integer('journal_id');
+            $table->integer('journal_type');
+            $table->integer('supplier_id');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateAccountsReceivablesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('accounts_receivables');
+        Schema::dropIfExists('accounts_payable_books');
     }
 }

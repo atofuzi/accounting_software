@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class MenbersTable extends Migration
+class CreateDepositBalances extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class MenbersTable extends Migration
      */
     public function up()
     {
-        Schema::create('members', function (Blueprint $table) {
+        Schema::create('deposit_balances', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('tel');
-            $table->string('password');
-            $table->rememberToken();
+            $table->text('account_month');
+            $table->integer('user_id');
+            $table->integer('bank_id');
+            $table->integer('deposit_item_id');
+            $table->integer('balance');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ class MenbersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('members');
+        Schema::dropIfExists('deposit_balances');
     }
 }

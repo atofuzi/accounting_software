@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLedgersTable extends Migration
+class CreateUseAccountsSubjects extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,10 @@ class CreateLedgersTable extends Migration
      */
     public function up()
     {
-        Schema::create('ledgers', function (Blueprint $table) {
+        Schema::create('use_account_subjects', function (Blueprint $table) {
             $table->id();
-            $table->text('ledger');
+            $table->integer('user_id');
+            $table->integer('account_subject_id');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ class CreateLedgersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ledgers');
+        Schema::dropIfExists('use_account_subjects');
     }
 }

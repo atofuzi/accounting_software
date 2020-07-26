@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountSubjectsTable extends Migration
+class CreateCashAccountBooks extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateAccountSubjectsTable extends Migration
      */
     public function up()
     {
-        Schema::create('account_subjects', function (Blueprint $table) {
+        Schema::create('cash_account_books', function (Blueprint $table) {
             $table->id();
-            $table->text('account_subject');
-            $table->text('key_name');
-            $table->text('bs_pl_type');
-            $table->text('bs_type_small')->default("");
+            $table->integer('journal_id');
+            $table->integer('journal_type');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ class CreateAccountSubjectsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('account_subjects');
+        Schema::dropIfExists('cash_account_books');
     }
 }

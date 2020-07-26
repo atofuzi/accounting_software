@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateExpensSubjectsTable extends Migration
+class CreateEvidenceDocuments extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class CreateExpensSubjectsTable extends Migration
      */
     public function up()
     {
-        Schema::create('expens_subjects', function (Blueprint $table) {
+        Schema::create('evidence_documents', function (Blueprint $table) {
             $table->id();
-            $table->text('expens_subject');
+            $table->integer('journal_id');
+            $table->date('account_date');
+            $table->text('comment');
+            $table->text('pic');
             $table->timestamps();
         });
     }
@@ -27,6 +30,6 @@ class CreateExpensSubjectsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('expens_subjects');
+        Schema::dropIfExists('evidence_documents');
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBanksTable extends Migration
+class RenameNameToBankNameOnBanksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,8 @@ class CreateBanksTable extends Migration
      */
     public function up()
     {
-        Schema::create('banks', function (Blueprint $table) {
-            $table->id();
-            $table->text('bank_name');
-            $table->timestamps();
+        Schema::table('banks', function (Blueprint $table) {
+            $table->renameColumn('name', 'bank_name');
         });
     }
 
@@ -27,6 +25,8 @@ class CreateBanksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('banks');
+        Schema::table('banks', function (Blueprint $table) {
+            $table->renameColumn('bank_name', 'name');
+        });
     }
 }

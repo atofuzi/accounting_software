@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Session;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -13,20 +14,24 @@ class JournalController extends Controller
         return view('journal');
 
     }
+    public function out()
+    {
+        return view('journal');
+    }
     public function create(Request $request)
     {
 
         $account_subject_id = $request->debit_account_subject_id;
         $account_subject = AccountSubjectTable::get($account_subject_id);
         
-        DB::table('sessions')->insert([
-            'amount' => $request->debit_amount,
-            'account_month' => 7,
-            'account_subject_id' => $account_subject_id,
-            'account_date' => $request->account_date,
-            'gentian_number' => $request->debit_gentian_number, 
+        //DB::table('sessions')->insert([
+            //'amount' => $request->debit_amount,
+            //'account_month' => 7,
+            //'account_subject_id' => $account_subject_id,
+            //'account_date' => $request->account_date,
+            //'gentian_number' => $request->debit_gentian_number, 
 
-        ]);
+        //]);
 
         return view('journal');
 

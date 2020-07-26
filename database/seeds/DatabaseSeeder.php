@@ -12,8 +12,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // 各テーブルへのデータの流し込みを呼び出す
-        $this->call(GentiansTableSeeder::class);
-        $this->call(AccountSbujectsTableSeeder::class);
+        //$this->call(GentiansTableSeeder::class);
+        $this->call(AccountSubjectsTableSeeder::class);
+        $this->call(BanksTableSeeder::class);
         // $this->call(UserSeeder::class);
     }
 }

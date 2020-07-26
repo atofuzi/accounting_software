@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountSubjectsTable extends Migration
+class CreateAccountsReceivableBalances extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateAccountSubjectsTable extends Migration
      */
     public function up()
     {
-        Schema::create('account_subjects', function (Blueprint $table) {
+        Schema::create('accounts_receivable_balances', function (Blueprint $table) {
             $table->id();
-            $table->text('account_subject');
-            $table->text('key_name');
-            $table->text('bs_pl_type');
-            $table->text('bs_type_small')->default("");
+            $table->integer('user_id');
+            $table->text('account_month');
+            $table->integer('supplier_id');
+            $table->integer('balance');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateAccountSubjectsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('account_subjects');
+        Schema::dropIfExists('accounts_receivable_balances');
     }
 }
