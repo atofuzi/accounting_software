@@ -15,6 +15,7 @@ class CreateAccountsPayableBooks extends Migration
     {
         Schema::create('accounts_payable_books', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id');
             $table->integer('journal_id');
             $table->integer('journal_type');
             $table->integer('supplier_id');

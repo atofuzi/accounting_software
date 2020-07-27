@@ -15,6 +15,7 @@ class CreateCashAccountBooks extends Migration
     {
         Schema::create('cash_account_books', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id');
             $table->integer('journal_id');
             $table->integer('journal_type');
             $table->timestamps();
