@@ -2010,6 +2010,14 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     JournalTableComponent: _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
+  created: function created() {
+    console.log('ユーザー情報取得');
+    axios.get('http://localhost:8888/accounting_software/public/api/user').then(function (response) {
+      console.log(response.data);
+    })["catch"](function (error) {
+      console.log('未ログインユーザです');
+    });
+  },
   methods: {
     add: function add() {
       this.journalTables.push({
@@ -51171,8 +51179,12 @@ try {
  */
 
 
-window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js"); //window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+axios.defaults.headers.common = {
+  'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
+  'X-Requested-With': 'XMLHttpRequest'
+};
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

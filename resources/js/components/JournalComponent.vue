@@ -57,6 +57,16 @@ export default {
     components:{
       JournalTableComponent
     },
+    created: function() {
+      console.log('ユーザー情報取得');
+      axios.get('http://localhost:8888/accounting_software/public/api/user')
+      .then(response => {
+          console.log(response.data);
+      })
+      .catch(error => {
+        console.log('未ログインユーザです');
+      });
+    },
     methods:{
       add: function(){
         this.journalTables.push({ id: this.nextTableId })
