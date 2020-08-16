@@ -18,7 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:api')->get('/test', 'TestController@test');
+Route::get('/use_account_subject/{user_id}', 'JournalController@getUseAccountSubject');
 
-Route::middleware('auth:api')->post('/journal', 'JournalController@');
+Route::middleware('auth:api')->get('/test', 'TestController@test');
 Route::middleware('auth:api')->post('/journal', 'JournalController@register');
+

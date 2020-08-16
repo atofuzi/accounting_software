@@ -7,6 +7,8 @@ use App\Http\Controllers\Session;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Auth;
+use App\UseAccountsSubject;
 
 class JournalController extends Controller
 {
@@ -32,7 +34,20 @@ class JournalController extends Controller
         return view('journal');
 
     }
+    public function getUseAccountSubject($userId){
+        $column = [
+            'account_subject_id',
+            'account_subjects.account_subject'
+        ];
+        $useAccountSubjects = DB::table('use_account_subjects')
+                                ->select($column)
+                                ->join('account_subjects', 'account_subject_id', 'account_subjects.id')
+                                ->where('user_id',$userId)
+                                ->get();
+        return $useAccountSubjects;
+    }
 }
+
 
 class AccountSubjectTable
 {
