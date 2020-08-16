@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UseAccountsSubject extends Model
+class UseAccountSubject extends Model
 {
     //
 }
