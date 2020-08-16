@@ -34,8 +34,9 @@ export default {
         }
     },
     methods: {
-        login: function(){
-            var url = 'http://localhost:8888/accounting_software/public/oauth/token';
+        async login(){
+            console.log('ログイン開始');
+            var getTokenUrl = 'http://localhost:8888/accounting_software/public/oauth/token';
             let params = new URLSearchParams();
             params.append('username', this.userName);
             params.append('password', this.password);
@@ -44,10 +45,9 @@ export default {
             params.append('client_secret', this.clientSecret);
             params.append('scop', this.scop);
 
-            axios.post(url, params)
+            await axios.post(getTokenUrl, params)
             .then(function(response){
-                    console.log(response);
-                    //location.href = 'http://localhost:8888/accounting_software/public/home';
+                console.log('token取得');                    
             })
             .catch(function(error){
                 var responseErrors = error.response.data.errors;
@@ -58,6 +58,19 @@ export default {
                 }
                 self.errors = errors;
             });
+
+            var loginUrl = 'http://localhost:8888/accounting_software/public/login';
+            let loginData = new URLSearchParams();
+            loginData.append('email',this.userName);
+            loginData.append('password',this.password);
+            
+            await axios.post(loginUrl,loginData).then(function(response){
+                console.log('ログイン成功');
+                location.href = 'http://localhost:8888/accounting_software/public/home';
+            })
+            .catch(function(error){
+
+            });     
         }
     }
 }
