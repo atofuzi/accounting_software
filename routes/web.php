@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 */
 
 Route::get('/', function () {
-    return view('login');
+    return view('index');
 });
 
 Auth::routes();
@@ -22,6 +22,5 @@ Auth::routes();
 Route::get('/home', 'JournalController@index')->name('journal')->middleware('auth');
 Route::post('/journal', 'JournalController@register')->name('journal')->middleware('auth');
 Route::put('/home', 'JournalController@update')->name('journal')->middleware('auth');
-
 
 Route::get('/test', 'TestController@get');
