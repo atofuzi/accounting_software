@@ -34,7 +34,7 @@ class JournalController extends Controller
         return view('journal');
 
     }
-    public function getUseAccountSubject($userId){
+    public function getUseAccountSubjects($userId){
         $column = [
             'account_subject_id',
             'account_subjects.account_subject'
@@ -45,6 +45,16 @@ class JournalController extends Controller
                                 ->where('user_id',$userId)
                                 ->get();
         return $useAccountSubjects;
+    }
+    public function getGentianNumbers(){
+        $column = [
+            'gentian_number',
+            'account_subject_id'
+        ];
+        $gentianNumbers = DB::table('gentians')
+                                ->select($column)
+                                ->get();
+        return $gentianNumbers;
     }
 }
 
