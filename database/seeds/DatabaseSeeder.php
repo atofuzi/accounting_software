@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call(BanksTableSeeder::class);
         $this->call(GentiansTableSeeder::class);
         $this->call(UseAccountSubjectsTableSeeder::class);
-        // $this->call(UserSeeder::class);
+        $this->call(SupplierTableSeeder::class);
+        //$this->call(UserSeeder::class);
+        $this->call(TestDataInsert::class);
     }
 }
