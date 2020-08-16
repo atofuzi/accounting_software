@@ -19,7 +19,6 @@ class CreateDepositAccountBooks extends Migration
             $table->integer('journal_id');
             $table->integer('journal_type');
             $table->integer('bank_id');
-            $table->integer('deposit_item');
             $table->integer('deposit_item_id');
             $table->timestamps();
         });
