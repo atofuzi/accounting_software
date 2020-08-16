@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div id="journal">
-    <journal-component></journal-component>
+<div id="login">
+    <login-component></login-component>
 </div>
 @endsection

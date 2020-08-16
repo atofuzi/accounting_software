@@ -6,21 +6,17 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Session;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use GuzzleHttp\Client;
 
 class JournalController extends Controller
 {
     public function index()
     {
         return view('journal');
-
     }
-    public function out()
+    public function register(Request $request)
     {
-        return view('journal');
-    }
-    public function create(Request $request)
-    {
-
+        dd($request);
         $account_subject_id = $request->debit_account_subject_id;
         $account_subject = AccountSubjectTable::get($account_subject_id);
         
