@@ -18,8 +18,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('use_account_subjects/{user_id}', 'JournalController@getUseAccountSubjects');
-Route::get('gentian_numbers', 'JournalController@getGentianNumbers');
+Route::middleware('auth:api')->get('use_account_subjects/{user_id}', 'JournalController@getUseAccountSubjects');
+Route::middleware('auth:api')->get('gentian_numbers', 'JournalController@getGentianNumbers');
+Route::middleware('auth:api')->get('bank_lists', 'JournalController@getBankLists');
+Route::middleware('auth:api')->get('supplier_lists', 'JournalController@getSupplierLists');
 Route::middleware('auth:api')->get('/test', 'TestController@test');
 Route::middleware('auth:api')->post('/journal', 'JournalController@register');
 

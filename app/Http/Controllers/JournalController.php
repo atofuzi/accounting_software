@@ -56,6 +56,20 @@ class JournalController extends Controller
                                 ->get();
         return $gentianNumbers;
     }
+    public function getBankLists(){
+        $banks = DB::table('banks')
+                        ->select('id')
+                        ->selectRaw('bank_name AS name')
+                        ->get();
+        return $banks;
+    }
+    public function getSupplierLists(){
+        $suppliers = DB::table('suppliers')
+                        ->select('id')
+                        ->selectRaw('supplier_name AS name')
+                        ->get();
+        return $suppliers;
+    }
 }
 
 

@@ -1953,7 +1953,16 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./parts/JournalTableComponent */ "./resources/js/components/parts/JournalTableComponent.vue");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parts/JournalTableComponent */ "./resources/js/components/parts/JournalTableComponent.vue");
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
 //
 //
 //
@@ -1984,40 +1993,89 @@ __webpack_require__.r(__webpack_exports__);
           accountSubjectId: "",
           amount: "",
           summary: "",
-          gentianNumber: ""
+          addInfoId: ""
         },
         credit: {
           accountDate: "",
           accountSubjectId: "",
           amount: "",
           summary: "",
-          gentianNumber: ""
+          addInfoId: ""
         }
       }],
       journalTables: [{
         id: 0
       }],
       nextTableId: 1,
-      journalSubjects: {
-        0: '',
-        1: '事業主貸',
-        2: '普通預金',
-        3: '未払金',
-        4: '売掛金'
-      }
+      journalSubjects: [],
+      gentians: [],
+      banks: [],
+      suppliers: []
     };
   },
   components: {
-    JournalTableComponent: _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+    JournalTableComponent: _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
-  created: function created() {
-    console.log('ユーザー情報取得');
-    axios.get('http://localhost:8888/accounting_software/public/api/user').then(function (response) {
-      console.log(response.data);
-    })["catch"](function (error) {
-      console.log('未ログインユーザです');
-    });
-  },
+  created: function () {
+    var _created = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+      var _this = this;
+
+      var user;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              console.log('ユーザー情報取得');
+              _context.next = 3;
+              return axios.get('http://localhost:8888/accounting_software/public/api/user')["catch"](function (error) {
+                console.log('ユーザー情報取得失敗');
+              });
+
+            case 3:
+              user = _context.sent;
+              console.log('会計科目情報取得');
+              _context.next = 7;
+              return axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/' + user.data.id).then(function (response) {
+                console.log(response.data);
+                _this.journalSubjects = response.data;
+              })["catch"](function (error) {
+                console.log('会計科目情報取得失敗');
+              });
+
+            case 7:
+              console.log('銀行リスト取得');
+              _context.next = 10;
+              return axios.get('http://localhost:8888/accounting_software/public/api/bank_lists').then(function (response) {
+                console.log(response.data);
+                _this.banks = response.data;
+              })["catch"](function (error) {
+                console.log('銀行リスト取得失敗');
+              });
+
+            case 10:
+              console.log('取引先リスト取得');
+              _context.next = 13;
+              return axios.get('http://localhost:8888/accounting_software/public/api/supplier_lists').then(function (response) {
+                console.log(response.data);
+                _this.suppliers = response.data;
+              })["catch"](function (error) {
+                console.log('銀行リスト取得失敗');
+              });
+
+            case 13:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+
+    function created() {
+      return _created.apply(this, arguments);
+    }
+
+    return created;
+  }(),
   methods: {
     add: function add() {
       this.journalTables.push({
@@ -2029,20 +2087,20 @@ __webpack_require__.r(__webpack_exports__);
           accountSubjectId: "",
           amount: "",
           summary: "",
-          gentianNumber: ""
+          addInfoId: ""
         },
         credit: {
           accountDate: "",
           accountSubjectId: "",
           amount: "",
           summary: "",
-          gentianNumber: ""
+          addInfoId: ""
         }
       });
       this.nextTableId = this.nextTableId + 1;
     },
     updateJournalData: function updateJournalData(id, inputData) {
-      if (inputData.key === "amount" || inputData.key === "gentianNumber") {
+      if (inputData.key === "amount") {
         this.data[id][inputData.type][inputData.key] = Number(inputData.value);
       } else {
         this.data[id][inputData.type][inputData.key] = inputData.value;
@@ -2227,11 +2285,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      isActiveDebit: false,
+      isActiveCredit: false,
+      addInfoTitleDebit: "",
+      addInfoTitleCredit: "",
+      addListsDebit: [],
+      addLlistsDebit: []
+    };
+  },
   props: {
-    journalSubjects: Object,
+    journalSubjects: Array,
     journalData: Object,
-    journalType: Object
+    journalType: Object,
+    banks: Array,
+    suppliers: Array
   },
   methods: {
     change: function change(event, journalType) {
@@ -2242,6 +2325,47 @@ __webpack_require__.r(__webpack_exports__);
       };
       console.log(data);
       this.$emit('change', data);
+
+      if (event.target.name === 'accountSubjectId') {
+        this.addSubject();
+      }
+    },
+    addSubject: function addSubject() {
+      if (this.journalData.debit.accountSubjectId >= 2 && this.journalData.debit.accountSubjectId <= 5) {
+        this.isActiveDebit = true;
+        this.addInfoTitleDebit = "取引銀行";
+        this.addListsDebit = this.banks;
+      } else if (this.journalData.debit.accountSubjectId == 7 || this.journalData.debit.accountSubjectId == 20) {
+        this.isActiveDebit = true;
+        this.addInfoTitleDebit = "取引先";
+        this.addListsDebit = this.suppliers;
+      } else {
+        this.isActiveDebit = false;
+        this.addInfoTitleDebit = "";
+        this.$emit('change', {
+          key: 'addInfoId',
+          value: "",
+          type: 'debit'
+        });
+      }
+
+      if (this.journalData.credit.accountSubjectId >= 2 && this.journalData.credit.accountSubjectId <= 5) {
+        this.isActiveCredit = true;
+        this.addInfoTitleCredit = "取引銀行";
+        this.addListsCredit = this.banks;
+      } else if (this.journalData.credit.accountSubjectId == 7 || this.journalData.credit.accountSubjectId == 20) {
+        this.isActiveCredit = true;
+        this.addInfoTitleCredit = "取引先";
+        this.addListsCredit = this.suppliers;
+      } else {
+        this.isActiveCredit = false;
+        this.addInfoTitleCredit = "";
+        this.$emit('change', {
+          key: 'addInfoId',
+          value: "",
+          type: 'credit'
+        });
+      }
     }
   }
 });
@@ -38581,7 +38705,7 @@ var render = function() {
   return _c("div", { staticClass: "container" }, [
     _c(
       "div",
-      { staticClass: "col" },
+      { staticClass: "col-md-8" },
       [
         _c(
           "button",
@@ -38595,6 +38719,9 @@ var render = function() {
             attrs: {
               journalData: _vm.data[table.id],
               journalSubjects: _vm.journalSubjects,
+              gentians: _vm.gentians,
+              banks: _vm.banks,
+              suppliers: _vm.suppliers,
               count: table.id
             },
             on: {
@@ -38605,24 +38732,15 @@ var render = function() {
           })
         }),
         _vm._v(" "),
-        _vm._m(0)
+        _c("button", { staticClass: "btn btn-outline-info" }, [
+          _vm._v("データを登録")
+        ])
       ],
       2
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("form", { attrs: { action: "api/journal", method: "POST" } }, [
-      _c("button", { staticClass: "btn btn-outline-info" }, [
-        _vm._v("データを登録")
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -38794,14 +38912,21 @@ var render = function() {
                   }
                 }
               },
-              _vm._l(_vm.journalSubjects, function(value, index) {
-                return _c(
-                  "option",
-                  { key: index, domProps: { value: index } },
-                  [_vm._v(_vm._s(value))]
-                )
-              }),
-              0
+              [
+                _c("option", { attrs: { value: "0" } }),
+                _vm._v(" "),
+                _vm._l(_vm.journalSubjects, function(value, index) {
+                  return _c(
+                    "option",
+                    {
+                      key: index,
+                      domProps: { value: value.account_subject_id }
+                    },
+                    [_vm._v(_vm._s(value.account_subject))]
+                  )
+                })
+              ],
+              2
             )
           ]),
           _vm._v(" "),
@@ -38819,16 +38944,95 @@ var render = function() {
                   }
                 }
               },
-              _vm._l(_vm.journalSubjects, function(value, index) {
-                return _c(
-                  "option",
-                  { key: index, domProps: { value: index } },
-                  [_vm._v(_vm._s(value))]
-                )
-              }),
-              0
+              [
+                _c("option", { attrs: { value: "0" } }),
+                _vm._v(" "),
+                _vm._l(_vm.journalSubjects, function(value, index) {
+                  return _c(
+                    "option",
+                    {
+                      key: index,
+                      domProps: { value: value.account_subject_id }
+                    },
+                    [_vm._v(_vm._s(value.account_subject))]
+                  )
+                })
+              ],
+              2
             )
           ])
+        ]),
+        _vm._v(" "),
+        _c("tr", [
+          _vm.isActiveDebit || _vm.isActiveCredit
+            ? _c("th", [_vm._v(_vm._s(_vm.addInfoTitleDebit))])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isActiveDebit
+            ? _c("td", [
+                _vm.isActiveDebit
+                  ? _c(
+                      "select",
+                      {
+                        attrs: { name: "addInfoId" },
+                        domProps: { value: _vm.journalData.debit.addInfoId },
+                        on: {
+                          change: function($event) {
+                            return _vm.change($event, "debit")
+                          }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "" } }),
+                        _vm._v(" "),
+                        _vm._l(_vm.addListsDebit, function(value, index) {
+                          return _c(
+                            "option",
+                            { key: index, domProps: { value: value.id } },
+                            [_vm._v(_vm._s(value.name))]
+                          )
+                        })
+                      ],
+                      2
+                    )
+                  : _vm._e()
+              ])
+            : _vm.isActiveCredit
+            ? _c("td")
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isActiveCredit
+            ? _c("th", [_vm._v(_vm._s(_vm.addInfoTitleCredit))])
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.isActiveCredit
+            ? _c("td", [
+                _c(
+                  "select",
+                  {
+                    attrs: { name: "addInfoId" },
+                    domProps: { value: _vm.journalData.credit.addInfoId },
+                    on: {
+                      change: function($event) {
+                        return _vm.change($event, "credit")
+                      }
+                    }
+                  },
+                  [
+                    _c("option", { attrs: { value: "" } }),
+                    _vm._v(" "),
+                    _vm._l(_vm.addListsCredit, function(value, index) {
+                      return _c(
+                        "option",
+                        { key: index, domProps: { value: value.id } },
+                        [_vm._v(_vm._s(value.name))]
+                      )
+                    })
+                  ],
+                  2
+                )
+              ])
+            : _vm._e()
         ]),
         _vm._v(" "),
         _c("tr", [
@@ -38882,36 +39086,6 @@ var render = function() {
             _c("input", {
               attrs: { type: "number", name: "amount" },
               domProps: { value: _vm.journalData.credit.amount },
-              on: {
-                change: function($event) {
-                  return _vm.change($event, "credit")
-                }
-              }
-            })
-          ])
-        ]),
-        _vm._v(" "),
-        _c("tr", [
-          _c("th", [_vm._v("元丁番号")]),
-          _vm._v(" "),
-          _c("td", [
-            _c("input", {
-              attrs: { type: "number", name: "gentianNumber" },
-              domProps: { value: _vm.journalData.debit.gentianNumber },
-              on: {
-                change: function($event) {
-                  return _vm.change($event, "debit")
-                }
-              }
-            })
-          ]),
-          _vm._v(" "),
-          _c("th", [_vm._v("元丁番号")]),
-          _vm._v(" "),
-          _c("td", [
-            _c("input", {
-              attrs: { type: "number", name: "gentianNumber" },
-              domProps: { value: _vm.journalData.credit.gentianNumber },
               on: {
                 change: function($event) {
                   return _vm.change($event, "credit")
