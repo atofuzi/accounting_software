@@ -2110,8 +2110,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     register: function register() {
       console.log('会計データ登録');
       axios.post('http://localhost:8888/accounting_software/public/api/journal_register', this.data).then(function (response) {
-        console.log('会計データ登録成功');
-        location.href = 'http://localhost:8888/accounting_software/public/home';
+        console.log('会計データ登録成功'); //location.href = 'http://localhost:8888/accounting_software/public/home';
       })["catch"](function (error) {
         console.log('会計データ登録失敗');
       });

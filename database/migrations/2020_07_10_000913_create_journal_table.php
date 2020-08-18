@@ -20,7 +20,6 @@ class CreateJournalTable extends Migration
             $table->date('account_date'); // 会計日
             $table->integer('account_subject_id'); // 会計科目id
             $table->text('summary')->nullable(); // 摘要
-            $table->integer('gentian_number'); // 元丁番号
             $table->integer('amount'); // 金額
             $table->integer('journal_type'); // 仕訳方 0=借方 1=貸方 
             $table->timestamps(); //登録日・更新日

@@ -17,7 +17,6 @@ class CreateCashAccountBooks extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('journal_id');
-            $table->integer('journal_type');
             $table->timestamps();
         });
     }

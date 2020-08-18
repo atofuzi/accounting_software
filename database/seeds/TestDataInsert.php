@@ -41,13 +41,12 @@ class TestDataInsert extends Seeder
                 \SplFileObject::DROP_NEW_LINE // 行末の改行を読み飛ばす
         );
         foreach ($file as $line) {
-            $journalId = DB::table('journals')
+            $journal_id = DB::table('journals')
                     ->insertGetId([
                         'user_id' => $line[1],
                         'account_date' => $line[0],
                         'account_subject_id' => $line[2],
                         'summary' => $line[3],
-                        'gentian_number' => $line[4],
                         'amount' => $line[5],
                         'journal_type' => $line[6],
                         'created_at' => Carbon::now(),
@@ -58,25 +57,25 @@ class TestDataInsert extends Seeder
             // 預金判定：account_subject_id 2〜5
             if ($line[2] >= 2 && $line[2] <= 5) {
                 // 預金元帳を作成する
-                $this->insertDepositAccountBooks($line, $journalId);
+                $this->insertDepositAccountBooks($line, $journal_id);
             }
 
             // 売掛金判定：account_subject_id 7
             if ($line[2] == 7) {
                 // 売掛金元帳を作成する
-                $this->insertAccountsReceivableBooks($line, $journalId);
+                $this->insertAccountsReceivableBooks($line, $journal_id);
             }
 
             // 買掛金判定：account_subject_id 20
             if ($line[2] == 20) {
                 // 買掛金元帳を作成する
-                $this->insertAccountsPayableBooks($line, $journalId);
+                $this->insertAccountsPayableBooks($line, $journal_id);
             }
 
             // 経費判定：account_subject_id 32〜52
             if ($line[2] >= 32 && $line[2] <= 52) {
                 // 経費元帳を作成する
-                $this->insertExpenseBooks($line, $journalId);
+                $this->insertExpenseBooks($line, $journal_id);
             }
         }
     }
@@ -88,16 +87,14 @@ class TestDataInsert extends Seeder
      * @return void
      *  
      */
-    public function insertDepositAccountBooks($data, $journalId)
+    public function insertDepositAccountBooks($data, $journal_id)
     {
-        $bankId = !empty($data[7]) ? $data[7] : 1;
+        $bank_id = !empty($data[7]) ? $data[7] : 1;
         $depositBook = new DepositAccountBook;
         $depositBook->insert([
             'user_id' => $data[1],
-            'journal_id' => $journalId,
-            'journal_type' => $data[6],
-            'bank_id' => $bankId,
-            'deposit_item_id' => $data[2],
+            'journal_id' => $journal_id,
+            'bank_id' => $bank_id,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
@@ -111,15 +108,14 @@ class TestDataInsert extends Seeder
      * @return void
      *  
      */
-    public function insertAccountsReceivableBooks($data, $journalId)
+    public function insertAccountsReceivableBooks($data, $journal_id)
     {
-        $supplierId = !empty($data[7]) ? $data[7] : 1;
+        $supplier_id = !empty($data[7]) ? $data[7] : 1;
         $accountsReceivableBook = new AccountsReceivableBook;
         $accountsReceivableBook->insert([
             'user_id' => $data[1],
-            'journal_id' => $journalId,
-            'journal_type' => $data[6],
-            'supplier_id' => $supplierId,
+            'journal_id' => $journal_id,
+            'supplier_id' => $supplier_id,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
@@ -133,15 +129,14 @@ class TestDataInsert extends Seeder
      * @return void
      *  
      */
-    public function insertAccountsPayableBooks($data, $journalId)
+    public function insertAccountsPayableBooks($data, $journal_id)
     {
-        $supplierId = !empty($data[7]) ? $data[7] : 1;
+        $supplier_id = !empty($data[7]) ? $data[7] : 1;
         $accountsPayableBook = new AccountsPayableBook;
         $accountsPayableBook->insert([
             'user_id' => $data[1],
-            'journal_id' => $journalId,
-            'journal_type' => $data[6],
-            'supplier_id' => $supplierId,
+            'journal_id' => $journal_id,
+            'supplier_id' => $supplier_id,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
@@ -155,13 +150,12 @@ class TestDataInsert extends Seeder
      * @return void
      *  
      */
-    public function insertExpenseBooks($data, $journalId)
+    public function insertExpenseBooks($data, $journal_id)
     {
         $expenseBook = new ExpenseBook;
         $expenseBook->insert([
             'user_id' => $data[1],
-            'journal_id' => $journalId,
-            'journal_type' => $data[6],
+            'journal_id' => $journal_id,
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);

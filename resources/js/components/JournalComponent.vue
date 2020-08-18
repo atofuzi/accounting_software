@@ -32,15 +32,13 @@ export default {
                 accountSubjectId : "",
                 amount : "",
                 summary : "",
-                addInfoId : "",
-                journalType: 0
+                addInfoId : ""
               },
               credit:{
                 accountSubjectId : "",
                 amount : "",
                 summary : "",
-                addInfoId: "",
-                journalType: 1
+                addInfoId: ""
               }
           }]
         },
@@ -105,14 +103,12 @@ export default {
                   amount: "",
                   summary: "",
                   addInfoId: "",
-                  journalType: 0
                 },
                 credit:{
                   accountSubjectId: "",
                   amount: "",
                   summary: "",
                   addInfoId: "",
-                  journalType: 1
               }
             })
         this.nextTableId = this.nextTableId + 1
@@ -134,7 +130,7 @@ export default {
         axios.post('http://localhost:8888/accounting_software/public/api/journal_register',this.data)
         .then(response => {
           console.log('会計データ登録成功');
-          location.href = 'http://localhost:8888/accounting_software/public/home';
+          //location.href = 'http://localhost:8888/accounting_software/public/home';
       })
         .catch(error => {
           console.log('会計データ登録失敗');

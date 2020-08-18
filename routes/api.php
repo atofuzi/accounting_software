@@ -23,5 +23,5 @@ Route::middleware('auth:api')->get('gentian_numbers', 'JournalController@getGent
 Route::middleware('auth:api')->get('bank_lists', 'JournalController@getBankLists');
 Route::middleware('auth:api')->get('supplier_lists', 'JournalController@getSupplierLists');
 Route::middleware('auth:api')->get('/test', 'TestController@test');
-Route::middleware('auth:api')->post('/journal', 'JournalController@register');
+Route::middleware('auth:api')->post('/journal_register', 'JournalController@register');
 
