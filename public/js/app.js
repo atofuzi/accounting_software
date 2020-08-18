@@ -1987,22 +1987,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      data: [{
-        debit: {
-          accountDate: "",
-          accountSubjectId: "",
-          amount: "",
-          summary: "",
-          addInfoId: ""
-        },
-        credit: {
-          accountDate: "",
-          accountSubjectId: "",
-          amount: "",
-          summary: "",
-          addInfoId: ""
-        }
-      }],
+      data: {
+        accountDate: "",
+        items: [{
+          debit: {
+            accountSubjectId: "",
+            amount: "",
+            summary: "",
+            addInfoId: ""
+          },
+          credit: {
+            accountSubjectId: "",
+            amount: "",
+            summary: "",
+            addInfoId: ""
+          }
+        }]
+      },
       journalTables: [{
         id: 0
       }],
@@ -2081,16 +2082,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.journalTables.push({
         id: this.nextTableId
       });
-      this.data.push({
+      this.data.items.push({
         debit: {
-          accountDate: "",
           accountSubjectId: "",
           amount: "",
           summary: "",
           addInfoId: ""
         },
         credit: {
-          accountDate: "",
           accountSubjectId: "",
           amount: "",
           summary: "",
@@ -2099,16 +2098,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
       this.nextTableId = this.nextTableId + 1;
     },
-    updateJournalData: function updateJournalData(id, inputData) {
+    updateJournalData: function updateJournalData(index, inputData) {
       if (inputData.key === "amount") {
-        this.data[id][inputData.type][inputData.key] = Number(inputData.value);
+        this.data.items[index][inputData.type][inputData.key] = Number(inputData.value);
+      } else if (inputData.key === "accountDate") {
+        this.data.accountDate = inputData.value;
       } else {
-        this.data[id][inputData.type][inputData.key] = inputData.value;
+        this.data.items[index][inputData.type][inputData.key] = inputData.value;
       }
-
-      if (inputData.key === "accountDate") {
-        this.data[id]['credit'][inputData.key] = inputData.value;
-      }
+    },
+    register: function register() {
+      console.log('会計データ登録');
+      axios.post('http://localhost:8888/accounting_software/public/api/journal_register', this.data).then(function (response) {
+        console.log('会計データ登録成功');
+        location.href = 'http://localhost:8888/accounting_software/public/home';
+      })["catch"](function (error) {
+        console.log('会計データ登録失敗');
+      });
     }
   }
 });
@@ -2314,7 +2320,8 @@ __webpack_require__.r(__webpack_exports__);
     journalData: Object,
     journalType: Object,
     banks: Array,
-    suppliers: Array
+    suppliers: Array,
+    count: Number
   },
   methods: {
     change: function change(event, journalType) {
@@ -17707,7 +17714,7 @@ return jQuery;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.15';
+  var VERSION = '4.17.20';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -21414,8 +21421,21 @@ return jQuery;
      * @returns {Array} Returns the new sorted array.
      */
     function baseOrderBy(collection, iteratees, orders) {
+      if (iteratees.length) {
+        iteratees = arrayMap(iteratees, function(iteratee) {
+          if (isArray(iteratee)) {
+            return function(value) {
+              return baseGet(value, iteratee.length === 1 ? iteratee[0] : iteratee);
+            }
+          }
+          return iteratee;
+        });
+      } else {
+        iteratees = [identity];
+      }
+
       var index = -1;
-      iteratees = arrayMap(iteratees.length ? iteratees : [identity], baseUnary(getIteratee()));
+      iteratees = arrayMap(iteratees, baseUnary(getIteratee()));
 
       var result = baseMap(collection, function(value, key, collection) {
         var criteria = arrayMap(iteratees, function(iteratee) {
@@ -21672,6 +21692,10 @@ return jQuery;
         var key = toKey(path[index]),
             newValue = value;
 
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          return object;
+        }
+
         if (index != lastIndex) {
           var objValue = nested[key];
           newValue = customizer ? customizer(objValue, key, nested) : undefined;
@@ -21824,11 +21848,14 @@ return jQuery;
      *  into `array`.
      */
     function baseSortedIndexBy(array, value, iteratee, retHighest) {
-      value = iteratee(value);
-
       var low = 0,
-          high = array == null ? 0 : array.length,
-          valIsNaN = value !== value,
+          high = array == null ? 0 : array.length;
+      if (high === 0) {
+        return 0;
+      }
+
+      value = iteratee(value);
+      var valIsNaN = value !== value,
           valIsNull = value === null,
           valIsSymbol = isSymbol(value),
           valIsUndefined = value === undefined;
@@ -23313,10 +23340,11 @@ return jQuery;
       if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
         return false;
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(array);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var arrStacked = stack.get(array);
+      var othStacked = stack.get(other);
+      if (arrStacked && othStacked) {
+        return arrStacked == other && othStacked == array;
       }
       var index = -1,
           result = true,
@@ -23478,10 +23506,11 @@ return jQuery;
           return false;
         }
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var objStacked = stack.get(object);
+      var othStacked = stack.get(other);
+      if (objStacked && othStacked) {
+        return objStacked == other && othStacked == object;
       }
       var result = true;
       stack.set(object, other);
@@ -26862,6 +26891,10 @@ return jQuery;
      * // The `_.property` iteratee shorthand.
      * _.filter(users, 'active');
      * // => objects for ['barney']
+     *
+     * // Combining several predicates using `_.overEvery` or `_.overSome`.
+     * _.filter(users, _.overSome([{ 'age': 36 }, ['age', 40]]));
+     * // => objects for ['fred', 'barney']
      */
     function filter(collection, predicate) {
       var func = isArray(collection) ? arrayFilter : baseFilter;
@@ -27611,15 +27644,15 @@ return jQuery;
      * var users = [
      *   { 'user': 'fred',   'age': 48 },
      *   { 'user': 'barney', 'age': 36 },
-     *   { 'user': 'fred',   'age': 40 },
+     *   { 'user': 'fred',   'age': 30 },
      *   { 'user': 'barney', 'age': 34 }
      * ];
      *
      * _.sortBy(users, [function(o) { return o.user; }]);
-     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
+     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 30]]
      *
      * _.sortBy(users, ['user', 'age']);
-     * // => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]
+     * // => objects for [['barney', 34], ['barney', 36], ['fred', 30], ['fred', 48]]
      */
     var sortBy = baseRest(function(collection, iteratees) {
       if (collection == null) {
@@ -32494,11 +32527,11 @@ return jQuery;
 
       // Use a sourceURL for easier debugging.
       // The sourceURL gets injected into the source that's eval-ed, so be careful
-      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
-      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
+      // to normalize all kinds of whitespace, so e.g. newlines (and unicode versions of it) can't sneak in
+      // and escape the comment, thus injecting code that gets evaled.
       var sourceURL = '//# sourceURL=' +
         (hasOwnProperty.call(options, 'sourceURL')
-          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
+          ? (options.sourceURL + '').replace(/\s/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -32531,8 +32564,6 @@ return jQuery;
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      // Like with sourceURL, we take care to not check the option's prototype,
-      // as this configuration is a code injection vector.
       var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
@@ -33239,6 +33270,9 @@ return jQuery;
      * values against any array or object value, respectively. See `_.isEqual`
      * for a list of supported value comparisons.
      *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
+     *
      * @static
      * @memberOf _
      * @since 3.0.0
@@ -33254,6 +33288,10 @@ return jQuery;
      *
      * _.filter(objects, _.matches({ 'a': 4, 'c': 6 }));
      * // => [{ 'a': 4, 'b': 5, 'c': 6 }]
+     *
+     * // Checking for several possible values
+     * _.filter(objects, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matches(source) {
       return baseMatches(baseClone(source, CLONE_DEEP_FLAG));
@@ -33267,6 +33305,9 @@ return jQuery;
      * **Note:** Partial comparisons will match empty array and empty object
      * `srcValue` values against any array or object value, respectively. See
      * `_.isEqual` for a list of supported value comparisons.
+     *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
      *
      * @static
      * @memberOf _
@@ -33284,6 +33325,10 @@ return jQuery;
      *
      * _.find(objects, _.matchesProperty('a', 4));
      * // => { 'a': 4, 'b': 5, 'c': 6 }
+     *
+     * // Checking for several possible values
+     * _.filter(objects, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matchesProperty(path, srcValue) {
       return baseMatchesProperty(path, baseClone(srcValue, CLONE_DEEP_FLAG));
@@ -33507,6 +33552,10 @@ return jQuery;
      * Creates a function that checks if **all** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -33533,6 +33582,10 @@ return jQuery;
      * Creates a function that checks if **any** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -33552,6 +33605,9 @@ return jQuery;
      *
      * func(NaN);
      * // => false
+     *
+     * var matchesFunc = _.overSome([{ 'a': 1 }, { 'a': 2 }])
+     * var matchesPropertyFunc = _.overSome([['a', 1], ['a', 2]])
      */
     var overSome = createOver(arraySome);
 
@@ -38717,7 +38773,7 @@ var render = function() {
           return _c("JournalTableComponent", {
             key: table.id,
             attrs: {
-              journalData: _vm.data[table.id],
+              journalData: _vm.data.items[table.id],
               journalSubjects: _vm.journalSubjects,
               gentians: _vm.gentians,
               banks: _vm.banks,
@@ -38732,9 +38788,18 @@ var render = function() {
           })
         }),
         _vm._v(" "),
-        _c("button", { staticClass: "btn btn-outline-info" }, [
-          _vm._v("データを登録")
-        ])
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            on: {
+              click: function($event) {
+                return _vm.register()
+              }
+            }
+          },
+          [_vm._v("データを登録")]
+        )
       ],
       2
     )
@@ -38877,25 +38942,27 @@ var render = function() {
       _vm._m(0),
       _vm._v(" "),
       _c("tbody", [
-        _c("tr", [
-          _c("th", [_vm._v("会計日")]),
-          _vm._v(" "),
-          _c("td", [
-            _c("input", {
-              attrs: { type: "date", name: "accountDate" },
-              domProps: { value: _vm.journalData.debit.accountDate },
-              on: {
-                change: function($event) {
-                  return _vm.change($event, "debit")
-                }
-              }
-            })
-          ]),
-          _vm._v(" "),
-          _c("th"),
-          _vm._v(" "),
-          _c("td")
-        ]),
+        _vm.count == 0
+          ? _c("tr", [
+              _c("th", [_vm._v("会計日")]),
+              _vm._v(" "),
+              _c("td", [
+                _c("input", {
+                  attrs: { type: "date", name: "accountDate" },
+                  domProps: { value: _vm.journalData.debit.accountDate },
+                  on: {
+                    change: function($event) {
+                      return _vm.change($event, "debit")
+                    }
+                  }
+                })
+              ]),
+              _vm._v(" "),
+              _c("th"),
+              _vm._v(" "),
+              _c("td")
+            ])
+          : _vm._e(),
         _vm._v(" "),
         _c("tr", [
           _c("th", [_vm._v("会計科目")]),
@@ -38918,11 +38985,8 @@ var render = function() {
                 _vm._l(_vm.journalSubjects, function(value, index) {
                   return _c(
                     "option",
-                    {
-                      key: index,
-                      domProps: { value: value.account_subject_id }
-                    },
-                    [_vm._v(_vm._s(value.account_subject))]
+                    { key: index, domProps: { value: value.accountSubjectId } },
+                    [_vm._v(_vm._s(value.accountSubject))]
                   )
                 })
               ],
@@ -38950,11 +39014,8 @@ var render = function() {
                 _vm._l(_vm.journalSubjects, function(value, index) {
                   return _c(
                     "option",
-                    {
-                      key: index,
-                      domProps: { value: value.account_subject_id }
-                    },
-                    [_vm._v(_vm._s(value.account_subject))]
+                    { key: index, domProps: { value: value.accountSubjectId } },
+                    [_vm._v(_vm._s(value.accountSubject))]
                   )
                 })
               ],
@@ -51333,7 +51394,13 @@ var app1 = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery) {window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery) {function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
  * for JavaScript based Bootstrap features such as modals and tabs. This
@@ -51359,6 +51426,64 @@ axios.defaults.headers.common = {
   'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
   'X-Requested-With': 'XMLHttpRequest'
 };
+
+var mapKeysDeep = function mapKeysDeep(data, callback) {
+  if (_.isArray(data)) {
+    return data.map(function (innerData) {
+      return mapKeysDeep(innerData, callback);
+    });
+  } else if (_.isObject(data)) {
+    return _.mapValues(_.mapKeys(data, callback), function (val) {
+      return mapKeysDeep(val, callback);
+    });
+  } else {
+    return data;
+  }
+};
+
+var mapKeysCamelCase = function mapKeysCamelCase(data) {
+  return mapKeysDeep(data, function (_value, key) {
+    return _.camelCase(key);
+  });
+};
+
+var mapKeysSnakeCase = function mapKeysSnakeCase(data) {
+  return mapKeysDeep(data, function (_value, key) {
+    return _.snakeCase(key);
+  });
+};
+
+axios.interceptors.response.use(function (response) {
+  var data = response.data;
+  var convertedData = mapKeysCamelCase(data);
+  return _objectSpread(_objectSpread({}, response), {}, {
+    data: convertedData
+  });
+}, function (error) {
+  console.log(error);
+  return Promise.reject(error);
+});
+axios.interceptors.request.use(function (request) {
+  if (!_.isEmpty(request.params)) {
+    var convertedData = mapKeysSnakeCase(request);
+    var convertedParams = mapKeysSnakeCase(request.params);
+    return _objectSpread(_objectSpread({}, request), {}, {
+      data: convertedData,
+      params: convertedParams
+    });
+  } else {
+    var data = request.data;
+
+    var _convertedData = mapKeysSnakeCase(data);
+
+    return _objectSpread(_objectSpread({}, request), {}, {
+      data: _convertedData
+    });
+  }
+}, function (error) {
+  console.log(error);
+  return Promise.reject(error);
+});
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

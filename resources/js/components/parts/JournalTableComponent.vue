@@ -8,7 +8,7 @@
                 <th></th>
             </thead>
             <tbody>
-                <tr>
+                <tr v-if="count == 0">
                     <th>会計日</th>
                     <td><input type="date" name="accountDate" :value="journalData.debit.accountDate" @change="change($event, 'debit')"></td>
                     <th></th>
@@ -19,14 +19,14 @@
                     <td>
                         <select name="accountSubjectId" :value="journalData.debit.accountSubjectId" @change="change($event, 'debit')">
                             <option value="0"></option>
-                            <option v-for="(value, index) in journalSubjects" :key="index" :value="value.account_subject_id">{{ value.account_subject }}</option>
+                            <option v-for="(value, index) in journalSubjects" :key="index" :value="value.accountSubjectId">{{ value.accountSubject }}</option>
                         </select>
                     </td>
                     <th>会計科目</th>
                     <td>
                         <select name="accountSubjectId" :value="journalData.credit.accountSubjectId" @change="change($event, 'credit')">
                             <option value="0"></option>
-                            <option v-for="(value, index) in journalSubjects" :key="index" :value="value.account_subject_id">{{ value.account_subject }}</option>
+                            <option v-for="(value, index) in journalSubjects" :key="index" :value="value.accountSubjectId">{{ value.accountSubject }}</option>
                         </select>
                     </td>
                 </tr>
@@ -82,7 +82,8 @@ export default {
         journalData:Object,
         journalType:Object,
         banks:Array,
-        suppliers:Array
+        suppliers:Array,
+        count:Number
     },
     methods:{
         change: function(event,journalType){

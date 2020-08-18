@@ -4,7 +4,7 @@
       <button v-on:click="add" class="btn btn-info my-3">テーブル追加</button> 
         <JournalTableComponent 
             v-for="table in journalTables"
-            :journalData="data[table.id]"
+            :journalData="data.items[table.id]"
             :journalSubjects="journalSubjects"
             :gentians="gentians"
             :banks="banks"
@@ -14,34 +14,36 @@
             v-on:change="updateJournalData(table.id,$event)"
         >
         </JournalTableComponent>
-          <button class="btn btn-outline-info">データを登録</button> 
+          <button @click="register()" class="btn btn-outline-info">データを登録</button> 
       </div>
   </div>
 </template>
 
 <script>
 import JournalTableComponent from './parts/JournalTableComponent'
+
 export default {
     data(){
       return{
-        data:[
-            {
-              debit:{
-                accountDate : "",
+        data:{
+          accountDate : "",
+          items:[{
+             debit:{
                 accountSubjectId : "",
                 amount : "",
                 summary : "",
                 addInfoId : "",
+                journalType: 0
               },
               credit:{
-                accountDate : "",
                 accountSubjectId : "",
                 amount : "",
                 summary : "",
-                addInfoId: ""
+                addInfoId: "",
+                journalType: 1
               }
-            }
-        ],
+          }]
+        },
         journalTables:[
             { id:0 },
         ],
@@ -64,7 +66,7 @@ export default {
       })
 
       console.log('会計科目情報取得');
-      await axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/' + user.data.id )
+      await axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/' + user.data.id)
       .then(response => {
           console.log(response.data);
           this.journalSubjects = response.data;
@@ -96,34 +98,47 @@ export default {
     methods:{
       add: function(){
         this.journalTables.push({ id: this.nextTableId })
-        this.data.push(
+        this.data.items.push(
               {
                 debit:{
-                  accountDate: "",
                   accountSubjectId: "",
                   amount: "",
                   summary: "",
                   addInfoId: "",
+                  journalType: 0
                 },
                 credit:{
-                  accountDate: "",
                   accountSubjectId: "",
                   amount: "",
                   summary: "",
-                  addInfoId: ""
+                  addInfoId: "",
+                  journalType: 1
               }
             })
         this.nextTableId = this.nextTableId + 1
       },
-      updateJournalData:function(id,inputData){
+      updateJournalData:function(index,inputData){
         if(inputData.key === "amount"){
-          this.data[id][inputData.type][inputData.key] = Number(inputData.value)
-        }else{
-          this.data[id][inputData.type][inputData.key] = inputData.value
+          this.data.items[index][inputData.type][inputData.key] = Number(inputData.value)
+        }else if(inputData.key === "accountDate"){
+          this.data.accountDate = inputData.value
         }
-        if(inputData.key === "accountDate"){
-          this.data[id]['credit'][inputData.key] = inputData.value
+        else{
+          this.data.items[index][inputData.type][inputData.key] = inputData.value
         }
+
+      },
+      register:function(){
+        console.log('会計データ登録');
+  
+        axios.post('http://localhost:8888/accounting_software/public/api/journal_register',this.data)
+        .then(response => {
+          console.log('会計データ登録成功');
+          location.href = 'http://localhost:8888/accounting_software/public/home';
+      })
+        .catch(error => {
+          console.log('会計データ登録失敗');
+        })
       }
     }
 }
