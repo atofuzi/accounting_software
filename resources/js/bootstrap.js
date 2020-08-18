@@ -28,6 +28,55 @@ axios.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };
 
+const mapKeysDeep = (data, callback) => {
+    if (_.isArray(data)) {
+        return data.map(innerData => mapKeysDeep(innerData, callback));
+    } else if (_.isObject(data)) {
+        return _.mapValues(_.mapKeys(data, callback), val =>
+            mapKeysDeep(val, callback)
+        );
+    } else {
+        return data;
+    }
+};
+
+const mapKeysCamelCase = data =>
+    mapKeysDeep(data, (_value, key) => _.camelCase(key));
+
+const mapKeysSnakeCase = data =>
+    mapKeysDeep(data, (_value, key) => _.snakeCase(key));
+
+axios.interceptors.response.use(
+    response => {
+        const { data } = response;
+        const convertedData = mapKeysCamelCase(data);
+        return { ...response, data: convertedData };
+    },
+    error => {
+        console.log(error);
+        return Promise.reject(error);
+    }
+);
+
+axios.interceptors.request.use(
+    request => {
+        if(!_.isEmpty(request.params)){
+            const convertedData = mapKeysSnakeCase(request);
+            const convertedParams = mapKeysSnakeCase(request.params);
+            return { ...request, data: convertedData, params: convertedParams }
+        }else{
+            const { data } = request;
+            const convertedData = mapKeysSnakeCase(data);
+            return { ...request, data: convertedData };
+        }
+    },
+    error => {
+        console.log(error);
+        return Promise.reject(error);
+    }
+);
+
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
