@@ -10,7 +10,7 @@
             <tbody>
                 <tr v-if="count == 0">
                     <th>会計日</th>
-                    <td><input type="date" name="accountDate" :value="journalData.debit.accountDate" @change="change($event, 'debit')"></td>
+                    <td><input type="date" name="accountDate" :value="journalData.accountDate" @change="change($event, 'debit')"></td>
                     <th></th>
                     <td></td>
                 </tr>

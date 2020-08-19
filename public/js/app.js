@@ -38948,7 +38948,7 @@ var render = function() {
               _c("td", [
                 _c("input", {
                   attrs: { type: "date", name: "accountDate" },
-                  domProps: { value: _vm.journalData.debit.accountDate },
+                  domProps: { value: _vm.journalData.accountDate },
                   on: {
                     change: function($event) {
                       return _vm.change($event, "debit")
