@@ -1983,6 +1983,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2315,6 +2316,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   props: {
+    accountDate: String,
     journalSubjects: Array,
     journalData: Object,
     journalType: Object,
@@ -38772,6 +38774,7 @@ var render = function() {
           return _c("JournalTableComponent", {
             key: table.id,
             attrs: {
+              accountDate: _vm.data.accountDate,
               journalData: _vm.data.items[table.id],
               journalSubjects: _vm.journalSubjects,
               gentians: _vm.gentians,
@@ -38948,7 +38951,7 @@ var render = function() {
               _c("td", [
                 _c("input", {
                   attrs: { type: "date", name: "accountDate" },
-                  domProps: { value: _vm.journalData.accountDate },
+                  domProps: { value: _vm.accountDate },
                   on: {
                     change: function($event) {
                       return _vm.change($event, "debit")

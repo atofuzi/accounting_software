@@ -4,6 +4,7 @@
       <button v-on:click="add" class="btn btn-info my-3">テーブル追加</button> 
         <JournalTableComponent 
             v-for="table in journalTables"
+            :accountDate="data.accountDate"
             :journalData="data.items[table.id]"
             :journalSubjects="journalSubjects"
             :gentians="gentians"
@@ -118,8 +119,7 @@ export default {
           this.data.items[index][inputData.type][inputData.key] = Number(inputData.value)
         }else if(inputData.key === "accountDate"){
           this.data.accountDate = inputData.value
-        }
-        else{
+        }else{
           this.data.items[index][inputData.type][inputData.key] = inputData.value
         }
 
