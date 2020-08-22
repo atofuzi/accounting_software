@@ -20,7 +20,7 @@ window.Vue = require('vue');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-Vue.component('journal-component', require('./components/JournalComponent.vue').default);
+Vue.component('journal-register-component', require('./components/JournalRegisterComponent.vue').default);
 Vue.component('login-component', require('./components/LoginComponent.vue').default);
 
 /**
@@ -30,7 +30,7 @@ Vue.component('login-component', require('./components/LoginComponent.vue').defa
  */
 
 const app = new Vue({
-    el: '#journal',
+    el: '#journal-register',
 });
 
 const app1 = new Vue({

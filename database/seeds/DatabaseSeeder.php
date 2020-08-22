@@ -1,4 +1,4 @@
-<?php
+m<?php
 
 use Illuminate\Database\Seeder;
 

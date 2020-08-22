@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MonthlyExpenseList extends Model
+class Supplier extends Model
 {
     //
 }

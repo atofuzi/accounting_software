@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Journal;
-use App\Gentian;
+use App\Models\Journal;
+use App\Models\Gentian;
 use App\User;
-use App\AccountSubject;
+use App\Models\AccountSubject;
 use Illuminate\Database\Eloquent\Builder;
 
 class TestController extends Controller

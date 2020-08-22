@@ -18,10 +18,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:api')->get('use_account_subjects/{user_id}', 'JournalController@getUseAccountSubjects');
-Route::middleware('auth:api')->get('gentian_numbers', 'JournalController@getGentianNumbers');
-Route::middleware('auth:api')->get('bank_lists', 'JournalController@getBankLists');
-Route::middleware('auth:api')->get('supplier_lists', 'JournalController@getSupplierLists');
+//　仕訳帳の入力・編集
+Route::middleware('auth:api')->get('use_account_subjects', 'JournalBookController@getUseAccountSubjects');
+Route::middleware('auth:api')->get('gentian_numbers', 'JournalBookController@getGentianNumbers');
+Route::middleware('auth:api')->get('bank_lists', 'JournalBookController@getBankLists');
+Route::middleware('auth:api')->get('supplier_lists', 'JournalBookController@getSupplierLists');
+Route::middleware('auth:api')->post('/journal_register', 'JournalBookController@register');
 Route::middleware('auth:api')->get('/test', 'TestController@test');
-Route::middleware('auth:api')->post('/journal_register', 'JournalController@register');
+
 

@@ -19,8 +19,8 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'JournalController@index')->name('journal')->middleware('auth');
-Route::post('/journal', 'JournalController@register')->name('journal')->middleware('auth');
-Route::put('/home', 'JournalController@update')->name('journal')->middleware('auth');
+Route::get('/home', 'JournalBookController@index')->name('journal')->middleware('auth');
+Route::post('/journal', 'JournalBookController@register')->name('journal')->middleware('auth');
+Route::put('/home', 'JournalBookController@update')->name('journal')->middleware('auth');
 
 Route::get('/test', 'TestController@get');

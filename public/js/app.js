@@ -1944,24 +1944,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalComponent.vue?vue&type=script&lang=js&":
-/*!***************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/JournalComponent.vue?vue&type=script&lang=js& ***!
-  \***************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalRegisterComponent.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/JournalRegisterComponent.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parts/JournalTableComponent */ "./resources/js/components/parts/JournalTableComponent.vue");
-
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
+/* harmony import */ var _parts_JournalInputComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./parts/JournalInputComponent */ "./resources/js/components/parts/JournalInputComponent.vue");
 //
 //
 //
@@ -2016,68 +2008,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   components: {
-    JournalTableComponent: _parts_JournalTableComponent__WEBPACK_IMPORTED_MODULE_1__["default"]
+    JournalInputComponent: _parts_JournalInputComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
-  created: function () {
-    var _created = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      var _this = this;
+  created: function created() {
+    var _this = this;
 
-      var user;
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              console.log('ユーザー情報取得');
-              _context.next = 3;
-              return axios.get('http://localhost:8888/accounting_software/public/api/user')["catch"](function (error) {
-                console.log('ユーザー情報取得失敗');
-              });
-
-            case 3:
-              user = _context.sent;
-              console.log('会計科目情報取得');
-              _context.next = 7;
-              return axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/' + user.data.id).then(function (response) {
-                console.log(response.data);
-                _this.journalSubjects = response.data;
-              })["catch"](function (error) {
-                console.log('会計科目情報取得失敗');
-              });
-
-            case 7:
-              console.log('銀行リスト取得');
-              _context.next = 10;
-              return axios.get('http://localhost:8888/accounting_software/public/api/bank_lists').then(function (response) {
-                console.log(response.data);
-                _this.banks = response.data;
-              })["catch"](function (error) {
-                console.log('銀行リスト取得失敗');
-              });
-
-            case 10:
-              console.log('取引先リスト取得');
-              _context.next = 13;
-              return axios.get('http://localhost:8888/accounting_software/public/api/supplier_lists').then(function (response) {
-                console.log(response.data);
-                _this.suppliers = response.data;
-              })["catch"](function (error) {
-                console.log('銀行リスト取得失敗');
-              });
-
-            case 13:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    }));
-
-    function created() {
-      return _created.apply(this, arguments);
-    }
-
-    return created;
-  }(),
+    console.log('会計科目情報取得');
+    axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/').then(function (response) {
+      console.log(response.data);
+      _this.journalSubjects = response.data;
+    })["catch"](function (error) {
+      console.log('会計科目情報取得失敗');
+    });
+    console.log('銀行リスト取得');
+    axios.get('http://localhost:8888/accounting_software/public/api/bank_lists').then(function (response) {
+      console.log(response.data);
+      _this.banks = response.data;
+    })["catch"](function (error) {
+      console.log('銀行リスト取得失敗');
+    });
+    console.log('取引先リスト取得');
+    axios.get('http://localhost:8888/accounting_software/public/api/supplier_lists').then(function (response) {
+      console.log(response.data);
+      _this.suppliers = response.data;
+    })["catch"](function (error) {
+      console.log('銀行リスト取得失敗');
+    });
+  },
   methods: {
     add: function add() {
       this.journalTables.push({
@@ -2229,9 +2186,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalTableComponent.vue?vue&type=script&lang=js&":
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalInputComponent.vue?vue&type=script&lang=js&":
 /*!**************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/parts/JournalTableComponent.vue?vue&type=script&lang=js& ***!
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/parts/JournalInputComponent.vue?vue&type=script&lang=js& ***!
   \**************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -38695,10 +38652,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalComponent.vue?vue&type=template&id=1dffca1e&":
-/*!*******************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/JournalComponent.vue?vue&type=template&id=1dffca1e& ***!
-  \*******************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalRegisterComponent.vue?vue&type=template&id=64e3a10e&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/JournalRegisterComponent.vue?vue&type=template&id=64e3a10e& ***!
+  \***************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -38722,7 +38679,7 @@ var render = function() {
         ),
         _vm._v(" "),
         _vm._l(_vm.journalTables, function(table) {
-          return _c("JournalTableComponent", {
+          return _c("JournalInputComponent", {
             key: table.id,
             attrs: {
               accountDate: _vm.data.accountDate,
@@ -38875,9 +38832,9 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalTableComponent.vue?vue&type=template&id=07447948&":
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalInputComponent.vue?vue&type=template&id=5d6900e0&":
 /*!******************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/parts/JournalTableComponent.vue?vue&type=template&id=07447948& ***!
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/parts/JournalInputComponent.vue?vue&type=template&id=5d6900e0& ***!
   \******************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -51322,7 +51279,7 @@ __webpack_provided_window_dot_Vue = __webpack_require__(/*! vue */ "./node_modul
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue")["default"]);
-Vue.component('journal-component', __webpack_require__(/*! ./components/JournalComponent.vue */ "./resources/js/components/JournalComponent.vue")["default"]);
+Vue.component('journal-register-component', __webpack_require__(/*! ./components/JournalRegisterComponent.vue */ "./resources/js/components/JournalRegisterComponent.vue")["default"]);
 Vue.component('login-component', __webpack_require__(/*! ./components/LoginComponent.vue */ "./resources/js/components/LoginComponent.vue")["default"]);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -51331,7 +51288,7 @@ Vue.component('login-component', __webpack_require__(/*! ./components/LoginCompo
  */
 
 var app = new Vue({
-  el: '#journal'
+  el: '#journal-register'
 });
 var app1 = new Vue({
   el: '#login'
@@ -51523,17 +51480,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/JournalComponent.vue":
-/*!******************************************************!*\
-  !*** ./resources/js/components/JournalComponent.vue ***!
-  \******************************************************/
+/***/ "./resources/js/components/JournalRegisterComponent.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/JournalRegisterComponent.vue ***!
+  \**************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _JournalComponent_vue_vue_type_template_id_1dffca1e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JournalComponent.vue?vue&type=template&id=1dffca1e& */ "./resources/js/components/JournalComponent.vue?vue&type=template&id=1dffca1e&");
-/* harmony import */ var _JournalComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JournalComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/JournalComponent.vue?vue&type=script&lang=js&");
+/* harmony import */ var _JournalRegisterComponent_vue_vue_type_template_id_64e3a10e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JournalRegisterComponent.vue?vue&type=template&id=64e3a10e& */ "./resources/js/components/JournalRegisterComponent.vue?vue&type=template&id=64e3a10e&");
+/* harmony import */ var _JournalRegisterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JournalRegisterComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/JournalRegisterComponent.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -51543,9 +51500,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _JournalComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _JournalComponent_vue_vue_type_template_id_1dffca1e___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _JournalComponent_vue_vue_type_template_id_1dffca1e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _JournalRegisterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _JournalRegisterComponent_vue_vue_type_template_id_64e3a10e___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _JournalRegisterComponent_vue_vue_type_template_id_64e3a10e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -51555,38 +51512,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/JournalComponent.vue"
+component.options.__file = "resources/js/components/JournalRegisterComponent.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/JournalComponent.vue?vue&type=script&lang=js&":
-/*!*******************************************************************************!*\
-  !*** ./resources/js/components/JournalComponent.vue?vue&type=script&lang=js& ***!
-  \*******************************************************************************/
+/***/ "./resources/js/components/JournalRegisterComponent.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/JournalRegisterComponent.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./JournalComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalRegisterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./JournalRegisterComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalRegisterComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalRegisterComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/JournalComponent.vue?vue&type=template&id=1dffca1e&":
-/*!*************************************************************************************!*\
-  !*** ./resources/js/components/JournalComponent.vue?vue&type=template&id=1dffca1e& ***!
-  \*************************************************************************************/
+/***/ "./resources/js/components/JournalRegisterComponent.vue?vue&type=template&id=64e3a10e&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/JournalRegisterComponent.vue?vue&type=template&id=64e3a10e& ***!
+  \*********************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalComponent_vue_vue_type_template_id_1dffca1e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./JournalComponent.vue?vue&type=template&id=1dffca1e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalComponent.vue?vue&type=template&id=1dffca1e&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalComponent_vue_vue_type_template_id_1dffca1e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalRegisterComponent_vue_vue_type_template_id_64e3a10e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./JournalRegisterComponent.vue?vue&type=template&id=64e3a10e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/JournalRegisterComponent.vue?vue&type=template&id=64e3a10e&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalRegisterComponent_vue_vue_type_template_id_64e3a10e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalComponent_vue_vue_type_template_id_1dffca1e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalRegisterComponent_vue_vue_type_template_id_64e3a10e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -51661,17 +51618,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/parts/JournalTableComponent.vue":
+/***/ "./resources/js/components/parts/JournalInputComponent.vue":
 /*!*****************************************************************!*\
-  !*** ./resources/js/components/parts/JournalTableComponent.vue ***!
+  !*** ./resources/js/components/parts/JournalInputComponent.vue ***!
   \*****************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _JournalTableComponent_vue_vue_type_template_id_07447948___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JournalTableComponent.vue?vue&type=template&id=07447948& */ "./resources/js/components/parts/JournalTableComponent.vue?vue&type=template&id=07447948&");
-/* harmony import */ var _JournalTableComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JournalTableComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/parts/JournalTableComponent.vue?vue&type=script&lang=js&");
+/* harmony import */ var _JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./JournalInputComponent.vue?vue&type=template&id=5d6900e0& */ "./resources/js/components/parts/JournalInputComponent.vue?vue&type=template&id=5d6900e0&");
+/* harmony import */ var _JournalInputComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./JournalInputComponent.vue?vue&type=script&lang=js& */ "./resources/js/components/parts/JournalInputComponent.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -51681,9 +51638,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _JournalTableComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _JournalTableComponent_vue_vue_type_template_id_07447948___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _JournalTableComponent_vue_vue_type_template_id_07447948___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _JournalInputComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -51693,38 +51650,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/parts/JournalTableComponent.vue"
+component.options.__file = "resources/js/components/parts/JournalInputComponent.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/parts/JournalTableComponent.vue?vue&type=script&lang=js&":
+/***/ "./resources/js/components/parts/JournalInputComponent.vue?vue&type=script&lang=js&":
 /*!******************************************************************************************!*\
-  !*** ./resources/js/components/parts/JournalTableComponent.vue?vue&type=script&lang=js& ***!
+  !*** ./resources/js/components/parts/JournalInputComponent.vue?vue&type=script&lang=js& ***!
   \******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalTableComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./JournalTableComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalTableComponent.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalTableComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./JournalInputComponent.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalInputComponent.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/parts/JournalTableComponent.vue?vue&type=template&id=07447948&":
+/***/ "./resources/js/components/parts/JournalInputComponent.vue?vue&type=template&id=5d6900e0&":
 /*!************************************************************************************************!*\
-  !*** ./resources/js/components/parts/JournalTableComponent.vue?vue&type=template&id=07447948& ***!
+  !*** ./resources/js/components/parts/JournalInputComponent.vue?vue&type=template&id=5d6900e0& ***!
   \************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalTableComponent_vue_vue_type_template_id_07447948___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./JournalTableComponent.vue?vue&type=template&id=07447948& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalTableComponent.vue?vue&type=template&id=07447948&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalTableComponent_vue_vue_type_template_id_07447948___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./JournalInputComponent.vue?vue&type=template&id=5d6900e0& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/parts/JournalInputComponent.vue?vue&type=template&id=5d6900e0&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalTableComponent_vue_vue_type_template_id_07447948___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -51748,8 +51705,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Applications/MAMP/htdocs/moma/accounting_software/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Applications/MAMP/htdocs/moma/accounting_software/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Applications/MAMP/htdocs/accounting_software/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /Applications/MAMP/htdocs/accounting_software/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
