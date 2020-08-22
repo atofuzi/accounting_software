@@ -11,9 +11,21 @@ use App\Models\AccountsReceivableBook;
 use App\Models\AccountsPayableBook;
 use App\Models\ExpenseBook;
 use App\Models\DepositAccountBook;
+use App\Services\JournalBookService;
 
 class JournalBookController extends Controller
 {
+    private $journalBookService = null;
+
+    public function __construct(JournalBookService $journalBookService)
+    {
+        $this->journalBookService = $journalBookService;
+    }
+
+    public function getJournalDate(Request $request){
+        $result = $this->journalBookService->getJournalBookList($request);
+        return $result;
+    }
     public function index()
     {
         return view('journal');
@@ -121,7 +133,7 @@ class JournalBookController extends Controller
     public function getUseAccountSubjects(){
         // ユーザID取得
         $user_id = Auth::id();
-        
+
         $column = [
             'account_subject_id',
             'account_subjects.account_subject'

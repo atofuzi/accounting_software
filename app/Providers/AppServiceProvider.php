@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\JournalBook\JournalBookRepositoryInterface;
+use App\Repositories\JournalBook\JournalBookRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // JournalBook
+        $this->app->bind(
+            JournalBookRepositoryInterface::class,
+            JournalBookRepository::class
+        );
     }
 
     /**
