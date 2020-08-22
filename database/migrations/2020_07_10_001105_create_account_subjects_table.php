@@ -18,7 +18,7 @@ class CreateAccountSubjectsTable extends Migration
             $table->text('account_subject');
             $table->text('key_name');
             $table->text('bs_pl_type');
-            $table->text('bs_type_small')->default("");
+            $table->text('bs_type_small')->nullable();
             $table->timestamps();
         });
     }
