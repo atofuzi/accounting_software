@@ -1,5 +1,8 @@
 <?php
 
+use App\Providers\CustomValidatorServiceProvider;
+use App\Providers\JournalServiceProvider;
+
 return [
 
     /*
@@ -175,6 +178,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\OwnServiceProvider::class,
+        // カスタムバリデーション
+        App\Providers\CustomValidatorServiceProvider::class,
 
     ],
 

@@ -76,6 +76,8 @@ return [
     'url'                  => ':attributeを正しい書式にしてください。',
     'select'               => ':attributeを選択してください',
 
+    'not_zero' => ':attributeに0は入力できません',
+
 
     /*
     |--------------------------------------------------------------------------
@@ -106,18 +108,7 @@ return [
     */
 
     'attributes' => [
-        'title' => 'タイトル',
-        'category_id' => 'カテゴリー',
-            'problem0' => '問題１',
-            'problem1' => '問題２',
-            'problem2' => '問題３',
-            'problem3' => '問題４',
-            'problem4' => '問題５',
-            'problem5' => '問題６',
-            'problem6' => '問題７',
-            'problem7' => '問題８',
-            'problem8' => '問題９',
-            'problem9' => '問題１０',
+
     ],
 
 ];

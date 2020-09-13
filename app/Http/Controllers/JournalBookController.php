@@ -12,6 +12,7 @@ use App\Models\AccountsPayableBook;
 use App\Models\ExpenseBook;
 use App\Models\DepositAccountBook;
 use App\Services\JournalBookService;
+use App\Http\Requests\JournalValidationRequest;
 
 class JournalBookController extends Controller
 {
@@ -31,7 +32,7 @@ class JournalBookController extends Controller
         return view('journal');
     }
 
-    public function register(Request $request)
+    public function register(JournalValidationRequest $request)
     {
                 
                 // 会計日

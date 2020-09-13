@@ -22,6 +22,8 @@
 
 <script>
 import JournalInputComponent from './parts/JournalInputComponent'
+import  myAxios  from '../utils/api.js'
+import { getAccountSubjects, getBankLists, getSupplierLists, registerJournal } from '../api/journal.js'
 
 export default {
     data(){
@@ -58,7 +60,7 @@ export default {
     },
     created: function() {
       console.log('会計科目情報取得');
-      axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/')
+      getAccountSubjects()
       .then(response => {
           console.log(response.data);
           this.journalSubjects = response.data;
@@ -68,7 +70,7 @@ export default {
       });
       
       console.log('銀行リスト取得');
-      axios.get('http://localhost:8888/accounting_software/public/api/bank_lists')
+      getBankLists()
       .then(response => {
           console.log(response.data);
           this.banks = response.data;
@@ -78,7 +80,7 @@ export default {
       });
       
       console.log('取引先リスト取得');
-      axios.get('http://localhost:8888/accounting_software/public/api/supplier_lists')
+      getSupplierLists()
       .then(response => {
           console.log(response.data);
           this.suppliers = response.data;
@@ -108,19 +110,18 @@ export default {
         this.nextTableId = this.nextTableId + 1
       },
       updateJournalData:function(index,inputData){
-        if(inputData.key === "amount"){
-          this.data.items[index][inputData.type][inputData.key] = Number(inputData.value)
+        if((inputData.key === "amount" || inputData.key === "accountSubjectId" || inputData.key === "addInfoId") && inputData.value !== ""){
+            this.data.items[index][inputData.type][inputData.key] = Number(inputData.value)
         }else if(inputData.key === "accountDate"){
           this.data.accountDate = inputData.value
         }else{
           this.data.items[index][inputData.type][inputData.key] = inputData.value
         }
-
       },
       register:function(){
         console.log('会計データ登録');
-  
-        axios.post('http://localhost:8888/accounting_software/public/api/journal_register',this.data)
+      
+        registerJournal(this.data)
         .then(response => {
           console.log('会計データ登録成功');
           //location.href = 'http://localhost:8888/accounting_software/public/home';

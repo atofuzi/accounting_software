@@ -1954,6 +1954,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _parts_JournalInputComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./parts/JournalInputComponent */ "./resources/js/components/parts/JournalInputComponent.vue");
+/* harmony import */ var _utils_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/api.js */ "./resources/js/utils/api.js");
+/* harmony import */ var _api_journal_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../api/journal.js */ "./resources/js/api/journal.js");
 //
 //
 //
@@ -1976,6 +1978,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -2014,21 +2018,21 @@ __webpack_require__.r(__webpack_exports__);
     var _this = this;
 
     console.log('会計科目情報取得');
-    axios.get('http://localhost:8888/accounting_software/public/api/use_account_subjects/').then(function (response) {
+    Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["getAccountSubjects"])().then(function (response) {
       console.log(response.data);
       _this.journalSubjects = response.data;
     })["catch"](function (error) {
       console.log('会計科目情報取得失敗');
     });
     console.log('銀行リスト取得');
-    axios.get('http://localhost:8888/accounting_software/public/api/bank_lists').then(function (response) {
+    Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["getBankLists"])().then(function (response) {
       console.log(response.data);
       _this.banks = response.data;
     })["catch"](function (error) {
       console.log('銀行リスト取得失敗');
     });
     console.log('取引先リスト取得');
-    axios.get('http://localhost:8888/accounting_software/public/api/supplier_lists').then(function (response) {
+    Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["getSupplierLists"])().then(function (response) {
       console.log(response.data);
       _this.suppliers = response.data;
     })["catch"](function (error) {
@@ -2057,7 +2061,7 @@ __webpack_require__.r(__webpack_exports__);
       this.nextTableId = this.nextTableId + 1;
     },
     updateJournalData: function updateJournalData(index, inputData) {
-      if (inputData.key === "amount") {
+      if ((inputData.key === "amount" || inputData.key === "accountSubjectId" || inputData.key === "addInfoId") && inputData.value !== "") {
         this.data.items[index][inputData.type][inputData.key] = Number(inputData.value);
       } else if (inputData.key === "accountDate") {
         this.data.accountDate = inputData.value;
@@ -2067,7 +2071,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     register: function register() {
       console.log('会計データ登録');
-      axios.post('http://localhost:8888/accounting_software/public/api/journal_register', this.data).then(function (response) {
+      Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["registerJournal"])(this.data).then(function (response) {
         console.log('会計データ登録成功'); //location.href = 'http://localhost:8888/accounting_software/public/home';
       })["catch"](function (error) {
         console.log('会計データ登録失敗');
@@ -38890,7 +38894,7 @@ var render = function() {
                 }
               },
               [
-                _c("option", { attrs: { value: "0" } }),
+                _c("option", { attrs: { value: "" } }),
                 _vm._v(" "),
                 _vm._l(_vm.journalSubjects, function(value, index) {
                   return _c(
@@ -38919,7 +38923,7 @@ var render = function() {
                 }
               },
               [
-                _c("option", { attrs: { value: "0" } }),
+                _c("option", { attrs: { value: "" } }),
                 _vm._v(" "),
                 _vm._l(_vm.journalSubjects, function(value, index) {
                   return _c(
@@ -51253,6 +51257,53 @@ module.exports = function(module) {
 
 /***/ }),
 
+/***/ "./resources/js/api/journal.js":
+/*!*************************************!*\
+  !*** ./resources/js/api/journal.js ***!
+  \*************************************/
+/*! exports provided: getAccountSubjects, getBankLists, getSupplierLists, registerJournal */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAccountSubjects", function() { return getAccountSubjects; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getBankLists", function() { return getBankLists; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getSupplierLists", function() { return getSupplierLists; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "registerJournal", function() { return registerJournal; });
+/* harmony import */ var _utils_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/api.js */ "./resources/js/utils/api.js");
+ // 仕訳帳登録画面
+// 利用会計科目データの取得
+
+function getAccountSubjects() {
+  return _utils_api_js__WEBPACK_IMPORTED_MODULE_0__["default"].get('use_account_subjects');
+} // 利用銀行リストの取得
+
+function getBankLists() {
+  return _utils_api_js__WEBPACK_IMPORTED_MODULE_0__["default"].get('bank_lists');
+} // 取引先リストの取得
+
+function getSupplierLists() {
+  return _utils_api_js__WEBPACK_IMPORTED_MODULE_0__["default"].get('supplier_lists');
+} // 仕訳データのデータの登録
+
+function registerJournal(requestData) {
+  var items = requestData.items;
+  Object.keys(items).forEach(function (index) {
+    Object.keys(items[index]).forEach(function (key) {
+      Object.keys(items[index][key]).forEach(function (value) {
+        console.log(value + ':' + items[index][key][value]);
+
+        if (!items[index][key][value]) {
+          delete items[index][key][value];
+        }
+      });
+    });
+  });
+  return _utils_api_js__WEBPACK_IMPORTED_MODULE_0__["default"].post('journal_register', requestData);
+}
+
+/***/ }),
+
 /***/ "./resources/js/app.js":
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
@@ -51304,13 +51355,7 @@ var app1 = new Vue({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery) {function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* WEBPACK VAR INJECTION */(function(__webpack_provided_window_dot_jQuery) {window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
  * for JavaScript based Bootstrap features such as modals and tabs. This
@@ -51330,70 +51375,8 @@ try {
  */
 
 
-window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js"); //window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-axios.defaults.headers.common = {
-  'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
-  'X-Requested-With': 'XMLHttpRequest'
-};
-
-var mapKeysDeep = function mapKeysDeep(data, callback) {
-  if (_.isArray(data)) {
-    return data.map(function (innerData) {
-      return mapKeysDeep(innerData, callback);
-    });
-  } else if (_.isObject(data)) {
-    return _.mapValues(_.mapKeys(data, callback), function (val) {
-      return mapKeysDeep(val, callback);
-    });
-  } else {
-    return data;
-  }
-};
-
-var mapKeysCamelCase = function mapKeysCamelCase(data) {
-  return mapKeysDeep(data, function (_value, key) {
-    return _.camelCase(key);
-  });
-};
-
-var mapKeysSnakeCase = function mapKeysSnakeCase(data) {
-  return mapKeysDeep(data, function (_value, key) {
-    return _.snakeCase(key);
-  });
-};
-
-axios.interceptors.response.use(function (response) {
-  var data = response.data;
-  var convertedData = mapKeysCamelCase(data);
-  return _objectSpread(_objectSpread({}, response), {}, {
-    data: convertedData
-  });
-}, function (error) {
-  console.log(error);
-  return Promise.reject(error);
-});
-axios.interceptors.request.use(function (request) {
-  if (!_.isEmpty(request.params)) {
-    var convertedData = mapKeysSnakeCase(request);
-    var convertedParams = mapKeysSnakeCase(request.params);
-    return _objectSpread(_objectSpread({}, request), {}, {
-      data: convertedData,
-      params: convertedParams
-    });
-  } else {
-    var data = request.data;
-
-    var _convertedData = mapKeysSnakeCase(data);
-
-    return _objectSpread(_objectSpread({}, request), {}, {
-      data: _convertedData
-    });
-  }
-}, function (error) {
-  console.log(error);
-  return Promise.reject(error);
-});
+window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
@@ -51682,6 +51665,127 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_JournalInputComponent_vue_vue_type_template_id_5d6900e0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/configs/configs.js":
+/*!*****************************************!*\
+  !*** ./resources/js/configs/configs.js ***!
+  \*****************************************/
+/*! exports provided: API_URL */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "API_URL", function() { return API_URL; });
+var API_URL = 'http://localhost:8888/accounting_software/public/api/';
+
+/***/ }),
+
+/***/ "./resources/js/utils/api.js":
+/*!***********************************!*\
+  !*** ./resources/js/utils/api.js ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _configs_configs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../configs/configs */ "./resources/js/configs/configs.js");
+/* harmony import */ var _utils_lib_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/lib.js */ "./resources/js/utils/lib.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+
+
+ // ベースURL設定
+
+axios__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.baseURL = _configs_configs__WEBPACK_IMPORTED_MODULE_1__["API_URL"]; // ヘッダー情報設定
+
+axios__WEBPACK_IMPORTED_MODULE_0___default.a.defaults.headers.common = {
+  'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
+  'X-Requested-With': 'XMLHttpRequest'
+}; // API：レスポンス時の処理
+
+axios__WEBPACK_IMPORTED_MODULE_0___default.a.interceptors.response.use(function (response) {
+  var data = response.data;
+  var convertedData = Object(_utils_lib_js__WEBPACK_IMPORTED_MODULE_2__["mapKeysCamelCase"])(data);
+  return _objectSpread(_objectSpread({}, response), {}, {
+    data: convertedData
+  });
+}, function (error) {
+  console.log(error);
+  return Promise.reject(error);
+}); // API：リクエスト時の処理
+
+axios__WEBPACK_IMPORTED_MODULE_0___default.a.interceptors.request.use(function (request) {
+  if (!_.isEmpty(request.params)) {
+    var convertedData = Object(_utils_lib_js__WEBPACK_IMPORTED_MODULE_2__["mapKeysSnakeCase"])(request);
+    var convertedParams = Object(_utils_lib_js__WEBPACK_IMPORTED_MODULE_2__["mapKeysSnakeCase"])(request.params);
+    return _objectSpread(_objectSpread({}, request), {}, {
+      data: convertedData,
+      params: convertedParams
+    });
+  } else {
+    var data = request.data;
+
+    var _convertedData = Object(_utils_lib_js__WEBPACK_IMPORTED_MODULE_2__["mapKeysSnakeCase"])(data);
+
+    return _objectSpread(_objectSpread({}, request), {}, {
+      data: _convertedData
+    });
+  }
+}, function (error) {
+  console.log(error);
+  return Promise.reject(error);
+});
+/* harmony default export */ __webpack_exports__["default"] = (axios__WEBPACK_IMPORTED_MODULE_0___default.a);
+
+/***/ }),
+
+/***/ "./resources/js/utils/lib.js":
+/*!***********************************!*\
+  !*** ./resources/js/utils/lib.js ***!
+  \***********************************/
+/*! exports provided: mapKeysCamelCase, mapKeysSnakeCase */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapKeysCamelCase", function() { return mapKeysCamelCase; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapKeysSnakeCase", function() { return mapKeysSnakeCase; });
+var mapKeysDeep = function mapKeysDeep(data, callback) {
+  if (_.isArray(data)) {
+    return data.map(function (innerData) {
+      return mapKeysDeep(innerData, callback);
+    });
+  } else if (_.isObject(data)) {
+    return _.mapValues(_.mapKeys(data, callback), function (val) {
+      return mapKeysDeep(val, callback);
+    });
+  } else {
+    return data;
+  }
+};
+
+var mapKeysCamelCase = function mapKeysCamelCase(data) {
+  return mapKeysDeep(data, function (_value, key) {
+    return _.camelCase(key);
+  });
+};
+
+var mapKeysSnakeCase = function mapKeysSnakeCase(data) {
+  return mapKeysDeep(data, function (_value, key) {
+    return _.snakeCase(key);
+  });
+};
 
 
 

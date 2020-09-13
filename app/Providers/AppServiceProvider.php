@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
         // JournalBook
         $this->app->bind(
             JournalBookRepositoryInterface::class,
-            JournalBookRepository::class
+            JournalBookRepository::class,
         );
     }
 

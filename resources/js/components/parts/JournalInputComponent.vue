@@ -18,14 +18,14 @@
                     <th>会計科目</th>
                     <td>
                         <select name="accountSubjectId" :value="journalData.debit.accountSubjectId" @change="change($event, 'debit')">
-                            <option value="0"></option>
+                            <option value=""></option>
                             <option v-for="(value, index) in journalSubjects" :key="index" :value="value.accountSubjectId">{{ value.accountSubject }}</option>
                         </select>
                     </td>
                     <th>会計科目</th>
                     <td>
                         <select name="accountSubjectId" :value="journalData.credit.accountSubjectId" @change="change($event, 'credit')">
-                            <option value="0"></option>
+                            <option value=""></option>
                             <option v-for="(value, index) in journalSubjects" :key="index" :value="value.accountSubjectId">{{ value.accountSubject }}</option>
                         </select>
                     </td>
