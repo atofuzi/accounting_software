@@ -1978,6 +1978,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -2008,7 +2009,8 @@ __webpack_require__.r(__webpack_exports__);
       journalSubjects: [],
       gentians: [],
       banks: [],
-      suppliers: []
+      suppliers: [],
+      errors: []
     };
   },
   components: {
@@ -2017,26 +2019,26 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     var _this = this;
 
-    console.log('会計科目情報取得');
+    console.log("会計科目情報取得");
     Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["getAccountSubjects"])().then(function (response) {
-      console.log(response.data);
+      console.log(response);
       _this.journalSubjects = response.data;
     })["catch"](function (error) {
-      console.log('会計科目情報取得失敗');
+      console.log("会計科目情報取得失敗");
     });
-    console.log('銀行リスト取得');
+    console.log("銀行リスト取得");
     Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["getBankLists"])().then(function (response) {
       console.log(response.data);
       _this.banks = response.data;
     })["catch"](function (error) {
-      console.log('銀行リスト取得失敗');
+      console.log("銀行リスト取得失敗");
     });
-    console.log('取引先リスト取得');
+    console.log("取引先リスト取得");
     Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["getSupplierLists"])().then(function (response) {
       console.log(response.data);
       _this.suppliers = response.data;
     })["catch"](function (error) {
-      console.log('銀行リスト取得失敗');
+      console.log("銀行リスト取得失敗");
     });
   },
   methods: {
@@ -2058,7 +2060,12 @@ __webpack_require__.r(__webpack_exports__);
           addInfoId: ""
         }
       });
-      this.nextTableId = this.nextTableId + 1;
+      this.nextTableId++;
+    },
+    tableDelete: function tableDelete() {
+      this.journalTables.pop();
+      this.data.items.pop();
+      this.nextTableId--;
     },
     updateJournalData: function updateJournalData(index, inputData) {
       if ((inputData.key === "amount" || inputData.key === "accountSubjectId" || inputData.key === "addInfoId") && inputData.value !== "") {
@@ -2070,11 +2077,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     register: function register() {
-      console.log('会計データ登録');
+      var _this2 = this;
+
+      console.log("会計データ登録");
       Object(_api_journal_js__WEBPACK_IMPORTED_MODULE_2__["registerJournal"])(this.data).then(function (response) {
-        console.log('会計データ登録成功'); //location.href = 'http://localhost:8888/accounting_software/public/home';
+        console.log("会計データ登録成功"); //location.href = 'http://localhost:8888/accounting_software/public/home';
       })["catch"](function (error) {
-        console.log('会計データ登録失敗');
+        console.log("会計データ登録失敗");
+        console.log(error.response.data.errors);
+        _this2.errors = error.response.data.errors;
       });
     }
   }
@@ -38682,6 +38693,12 @@ var render = function() {
           [_vm._v("テーブル追加")]
         ),
         _vm._v(" "),
+        _vm._l(_vm.errors, function(error) {
+          return _c("li", { staticClass: "text-danger" }, [
+            _vm._v(_vm._s(error.message))
+          ])
+        }),
+        _vm._v(" "),
         _vm._l(_vm.journalTables, function(table) {
           return _c("JournalInputComponent", {
             key: table.id,
@@ -38713,7 +38730,18 @@ var render = function() {
             }
           },
           [_vm._v("データを登録")]
-        )
+        ),
+        _vm._v(" "),
+        _vm.nextTableId > 1
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-info",
+                on: { click: _vm.tableDelete }
+              },
+              [_vm._v("テーブル削除")]
+            )
+          : _vm._e()
       ],
       2
     )
@@ -51287,20 +51315,23 @@ function getSupplierLists() {
 } // 仕訳データのデータの登録
 
 function registerJournal(requestData) {
-  var items = requestData.items;
-  Object.keys(items).forEach(function (index) {
-    Object.keys(items[index]).forEach(function (key) {
-      Object.keys(items[index][key]).forEach(function (value) {
-        console.log(value + ':' + items[index][key][value]);
-
-        if (!items[index][key][value]) {
-          delete items[index][key][value];
-        }
-      });
-    });
-  });
   return _utils_api_js__WEBPACK_IMPORTED_MODULE_0__["default"].post('journal_register', requestData);
 }
+/* // 仕訳データのデータの登録
+export function registerJournal(requestData){
+    const items = requestData.items;
+    Object.keys(items).forEach(function(index){
+        Object.keys(items[index]).forEach(function(key){
+            Object.keys(items[index][key]).forEach(function(value){
+                // 空の場合はリクエストパラメータから削除する
+                if(!items[index][key][value]){
+                    delete items[index][key][value];
+                }
+            })
+        })
+    });
+    return  axios.post('journal_register', requestData);
+} */
 
 /***/ }),
 
@@ -51761,6 +51792,7 @@ axios__WEBPACK_IMPORTED_MODULE_0___default.a.interceptors.request.use(function (
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapKeysCamelCase", function() { return mapKeysCamelCase; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mapKeysSnakeCase", function() { return mapKeysSnakeCase; });
+// 変換するキーを取得
 var mapKeysDeep = function mapKeysDeep(data, callback) {
   if (_.isArray(data)) {
     return data.map(function (innerData) {
@@ -51773,13 +51805,15 @@ var mapKeysDeep = function mapKeysDeep(data, callback) {
   } else {
     return data;
   }
-};
+}; // キャメルケースへ変換
+
 
 var mapKeysCamelCase = function mapKeysCamelCase(data) {
   return mapKeysDeep(data, function (_value, key) {
     return _.camelCase(key);
   });
-};
+}; // スネークケースへ変換 
+
 
 var mapKeysSnakeCase = function mapKeysSnakeCase(data) {
   return mapKeysDeep(data, function (_value, key) {

@@ -1,3 +1,4 @@
+// 変換するキーを取得
 const mapKeysDeep = (data, callback) => {
     if (_.isArray(data)) {
         return data.map(innerData => mapKeysDeep(innerData, callback));
@@ -10,9 +11,11 @@ const mapKeysDeep = (data, callback) => {
     }
 };
 
+// キャメルケースへ変換
 const mapKeysCamelCase = data =>
     mapKeysDeep(data, (_value, key) => _.camelCase(key));
 
+// スネークケースへ変換 
 const mapKeysSnakeCase = data =>
     mapKeysDeep(data, (_value, key) => _.snakeCase(key));
 

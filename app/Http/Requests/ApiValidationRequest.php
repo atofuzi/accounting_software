@@ -12,7 +12,7 @@ trait ApiValidationRequest
         $errors = [];
 
         $errorItems = $validator->errors()->toArray();
-        foreach($errorItems as $key => $value){
+        foreach ($errorItems as $key => $value) {
             $errors[] = ['code' => $key, 'message' => $value[0]];
         }
 
