@@ -19,13 +19,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 //　仕訳帳の入力・編集
-Route::middleware('auth:api')->get('use_account_subjects', 'JournalBookController@getUseAccountSubjects');
-Route::middleware('auth:api')->get('gentian_numbers', 'JournalBookController@getGentianNumbers');
-Route::middleware('auth:api')->get('bank_lists', 'JournalBookController@getBankLists');
-Route::middleware('auth:api')->get('supplier_lists', 'JournalBookController@getSupplierLists');
-Route::middleware('auth:api')->post('/journal_register', 'JournalBookController@register');
-Route::middleware('auth:api')->get('/journal_list', 'JournalBookController@getJournalDate');
+Route::middleware('auth:api')->get('use_account_subjects', 'AccountSubjectsController@useAccountSubjects');
+Route::middleware('auth:api')->get('use_bank_lists', 'BankController@useBankLists');
+Route::middleware('auth:api')->get('use_supplier_lists', 'SupplierController@useSupplierLists');
+Route::middleware('auth:api')->post('journal_register', 'JournalRegisterController@journalRegister');
+Route::middleware('auth:api')->get('journal_edit', 'JournalRegisterController@journalEdit');
+Route::middleware('auth:api')->post('journal_update', 'JournalRegisterController@journalUpdate');
+Route::middleware('auth:api')->put('journal_delete', 'JournalRegisterController@journalDelete');
 
+Route::middleware('auth:api')->get('/record_journal', 'RecordController@recordJournal');
 Route::middleware('auth:api')->get('/test', 'TestController@test');
-
-

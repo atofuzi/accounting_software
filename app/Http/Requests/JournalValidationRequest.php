@@ -24,11 +24,11 @@ class JournalValidationRequest extends FormRequest
      * @return array
      */
 
-    private $accountSubjects = null;
+    private $account_subjects = null;
 
     public function __construct()
     {
-        $this->accountSubjects = new AccountSubjects;
+        $this->account_subjects = new accountSubjects;
     }
 
     public function rules()
@@ -42,11 +42,12 @@ class JournalValidationRequest extends FormRequest
             // 金額に0は入力できない
             // 2つ目のテーブルはnullでもOKだが一つでもデータが入っている場合は、入力必須にする必要がある
             'account_date' => 'required',
-            'items.0.*.account_subject_id' => 'required',
-            'items.0.*.summary' => 'required',
-            'items.0.*.amount' => 'required',
-            'items.*.debit.amount' => 'not_zero',
-            'items.*.credit.amount' => 'not_zero'
+            'debit.0.account_subject_id' => 'required',
+            'credit.0.account_subject_id' => 'required',
+            'debit.0.summary' => 'required',
+            'credit.0.summary' => 'required',
+            'debit.0.amount' => 'required | not_zero',
+            'credit.0.amount' => 'required | not_zero',
         ];
 
         return $rules;
@@ -56,16 +57,14 @@ class JournalValidationRequest extends FormRequest
     {
         return [
             'account_date' => '会計日',
-            'items.0.debit.account_subject_id' => '借方の会計科目',
-            'items.0.credit.account_subject_id' => '借方の会計科目',
-            'items.0.debit.summary' => '借方の摘要',
-            'items.0.credit.summary' => '貸方の摘要',
-            'items.0.debit.amount' => '借方の金額',
-            'items.0.credit.amount' => '貸方の金額',
-            'items.*.debit.amount' => '借方の金額',
-            'items.*.credit.amount' => '貸方の金額',
-            'items.0.debit.add_info_id' => '借方の取引銀行または取引先',
-            'items.0.credit.add_info_id' => '借方の取引銀行または取引先'
+            'debit.0.account_subject_id' => '借方の会計科目',
+            'credit.0.account_subject_id' => '借方の会計科目',
+            'debit.0.summary' => '借方の摘要',
+            'credit.0.summary' => '貸方の摘要',
+            'debit.0.amount' => '借方の金額',
+            'credit.0.amount' => '貸方の金額',
+            'debit.0.add_info_id' => '借方の取引銀行または取引先',
+            'credit.0.add_info_id' => '借方の取引銀行または取引先'
         ];
     }
     public function messages()
@@ -78,65 +77,71 @@ class JournalValidationRequest extends FormRequest
 
     public function withValidator(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        //if ($validator->fails()) return;
-        $validator->after(function ($validator) {
-            $depositAmount = 0;
-            $creditAmount = 0;
-            foreach ($this->input('items') as $journal_data) {
-                // 借方と貸方のそれぞれの金額の合計値が等しいかの確認
-                if (!empty($journal_data['debit']['amount'])) {
-                    $depositAmount = $depositAmount + $journal_data['debit']['amount'];
-                }
-                if (!empty($journal_data['credit']['amount'])) {
-                    $creditAmount = $creditAmount + $journal_data['credit']['amount'];
-                }
-            }
-            if ($creditAmount !== $depositAmount) {
-                $validator->errors()->add('amount_check', '借方と貸方の金額が異なっています');
-            };
-        });
-        $validator->sometimes('items.0.debit.add_info_id', 'required', function ($formData) {
+        $validator->sometimes('debit.0.add_info_id', 'required', function ($formData) {
             $result = false;
-            foreach ($formData->items as $journal_data) {
-                if (in_array($journal_data['debit']['account_subject_id'], $this->accountSubjects->addInfoGroup)) {
-                    $result = true;
-                }
+            if (in_array($formData['debit'][0]['account_subject_id'], $this->account_subjects->add_info_group)) {
+                $result = true;
             }
             return $result;
         });
-        $validator->sometimes('items.0.credit.add_info_id', 'required', function ($formData) {
+        $validator->sometimes('credit.0.add_info_id', 'required', function ($formData) {
             $result = false;
-            foreach ($formData->items as $journal_data) {
-                if (in_array($journal_data['credit']['account_subject_id'], $this->accountSubjects->addInfoGroup)) {
-                    $result = true;
-                }
+            if (in_array($formData['credit'][0]['account_subject_id'], $this->account_subjects->add_info_group)) {
+                $result = true;
             }
             return $result;
         });
+
         $validator->after(function ($validator) {
-            foreach ($this->items as $key => $journal_data) {
+            $count = 0;
+            foreach ($this->input('debit') as $key => $debit_data) {
                 if ($key > 0) {
                     if (
-                        !empty($journal_data['credit']['account_subject_id'])
-                        || !empty($journal_data['credit']['summary'])
-                        || !empty($journal_data['credit']['amount'])
-                    ) {
-                        $validator->errors()->add('add_table_credit', '追加したテーブルの貸方に未入力項目があります');
-                    }
-                }
-            }
-        });
-        $validator->after(function ($validator) {
-            foreach ($this->items as $key => $journal_data) {
-                if ($key > 0) {
-                    if (
-                        !empty($journal_data['debit']['account_subject_id'])
-                        || !empty($journal_data['debit']['summary'])
-                        || !empty($journal_data['debit']['amount'])
+                        !isset($debit_data['account_subject_id'])
+                        || !isset($debit_data['summary'])
+                        || !isset($debit_data['amount'])
                     ) {
                         $validator->errors()->add('add_table_debit', '追加したテーブルの借方に未入力項目があります');
+                        $count++;
+                    } else if (
+                        in_array($debit_data['account_subject_id'], $this->account_subjects->add_info_group)
+                        && !isset($debit_data['add_info_id'])
+                    ) {
+                        $validator->errors()->add('add_table_debit', '追加したテーブルの借方に未入力項目があります');
+                        $count++;
                     }
                 }
+            }
+            foreach ($this->input('credit') as $key => $credit_data) {
+                if ($key > 0) {
+                    if (
+                        !isset($credit_data['account_subject_id'])
+                        || !isset($credit_data['summary'])
+                        || !isset($credit_data['amount'])
+                    ) {
+                        $validator->errors()->add('add_table_credit', '追加したテーブルの貸方に未入力項目があります');
+                        $count++;
+                    } else if (
+                        in_array($credit_data['account_subject_id'], $this->account_subjects->add_info_group)
+                        && !isset($credit_data['add_info_id'])
+                    ) {
+                        $validator->errors()->add('add_table_credit', '追加したテーブルの貸方に未入力項目があります');
+                        $count++;
+                    }
+                }
+            }
+            if (!$count) {
+                $debit_amount = 0;
+                $credit_amount = 0;
+                foreach ($this->input('debit') as $debit_data) {
+                    $debit_amount = $debit_amount + $debit_data['amount'];
+                }
+                foreach ($this->input('credit') as $debit_data) {
+                    $credit_amount = $credit_amount + $debit_data['amount'];
+                }
+                if ($credit_amount !== $debit_amount) {
+                    $validator->errors()->add('amount_check', '借方と貸方の金額が異なっています');
+                };
             }
         });
     }

@@ -26,7 +26,7 @@
 26,事業主借,business_owner_debit,資本,自己資本,,
 27,元入金,owned_capital,資本,自己資本,,
 28,所得金額,earning_amount,資本,当期利益,,
-29,売上金残高,sales_amount,売上,,,
+29,売上金,sales_amount,売上,,,
 30,雑収入,miscellaneous_income,売上,,,
 31,仕入金額,purchase_amount,売上原価,,,
 32,租税公課,tax_public_dues,経費,,,

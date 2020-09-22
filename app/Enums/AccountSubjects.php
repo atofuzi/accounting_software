@@ -16,7 +16,13 @@ class AccountSubjects
     const BILLS_PAYABLE = 19;
     const ACCOUNTS_PAYABLE = 20;
 
-    public $addInfoGroup = [
+    /**
+     * 会計科目タイプの定数
+     */
+    const TYPE_DEBIT = 0;
+    const TYPE_CREDIT = 1;
+
+    public $add_info_group = [
         self::NORMAL_DEPOSIT,
         self::CURRENT_ACCOUNT,
         self::TIME_DEPOSIT,
@@ -25,5 +31,11 @@ class AccountSubjects
         self::ACCOUNTS_RECEIVABLE,
         self::BILLS_PAYABLE,
         self::ACCOUNTS_PAYABLE,
+    ];
+    const DEPOSIT_GROUP = [
+        self::NORMAL_DEPOSIT,
+        self::CURRENT_ACCOUNT,
+        self::TIME_DEPOSIT,
+        self::OTHER_DEPOSIT,
     ];
 }
