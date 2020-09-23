@@ -6,6 +6,10 @@ use App\Repositories\JournalRegister\JournalRegisterRepositoryInterface;
 use App\Enums\AccountSubjects;
 use Facade\FlareClient\Enums\MessageLevels;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Exceptions\BaseErrorResponseException;
+use App\Enums\Error;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class JournalRegisterService
 {
@@ -34,33 +38,43 @@ class JournalRegisterService
 
         // 会計データ数で処理を分岐
         // データの少ない方からテーブルに格納する
-        if (count($debit_items) <= count($credit_items)) {
-            foreach ($debit_items as $debit_item) {
-                $debit_item['account_date'] = $request->account_date;
-                $debit_item['unit_number'] = $unit_number;
-                $debit_item['journal_type'] = AccountSubjects::TYPE_DEBIT; // debit:0
-                $this->registerProcessRun($debit_item, $user_id);
+
+        DB::beginTransaction();
+
+        try {
+            if (count($debit_items) <= count($credit_items)) {
+                foreach ($debit_items as $debit_item) {
+                    $debit_item['account_date'] = $request->account_date;
+                    $debit_item['unit_number'] = $unit_number;
+                    $debit_item['journal_type'] = AccountSubjects::TYPE_DEBIT; // debit:0
+                    $this->registerProcessRun($debit_item, $user_id);
+                }
+                foreach ($credit_items as $credit_item) {
+                    $credit_item['account_date'] = $request->account_date;
+                    $credit_item['unit_number'] = $unit_number;
+                    $credit_item['journal_type'] = AccountSubjects::TYPE_CREDIT; // credit:1
+                    $this->registerProcessRun($credit_item, $user_id);
+                }
+            } else {
+                foreach ($credit_items as $credit_item) {
+                    $credit_item['account_date'] = $request->account_date;
+                    $credit_item['unit_number'] = $unit_number;
+                    $credit_item['journal_type'] = AccountSubjects::TYPE_CREDIT; // credit:1
+                    $this->registerProcessRun($credit_item, $user_id);
+                }
+                foreach ($debit_items as $debit_item) {
+                    $debit_item['account_date'] = $request->account_date;
+                    $debit_item['unit_number'] = $unit_number;
+                    $debit_item['journal_type'] = AccountSubjects::TYPE_DEBIT; // debit:0
+                    $this->registerProcessRun($debit_item, $user_id);
+                }
             }
-            foreach ($credit_items as $credit_item) {
-                $credit_item['account_date'] = $request->account_date;
-                $credit_item['unit_number'] = $unit_number;
-                $credit_item['journal_type'] = AccountSubjects::TYPE_CREDIT; // credit:1
-                $this->registerProcessRun($credit_item, $user_id);
-            }
-        } else {
-            foreach ($credit_items as $credit_item) {
-                $credit_item['account_date'] = $request->account_date;
-                $credit_item['unit_number'] = $unit_number;
-                $credit_item['journal_type'] = AccountSubjects::TYPE_CREDIT; // credit:1
-                $this->registerProcessRun($credit_item, $user_id);
-            }
-            foreach ($debit_items as $debit_item) {
-                $debit_item['account_date'] = $request->account_date;
-                $debit_item['unit_number'] = $unit_number;
-                $debit_item['journal_type'] = AccountSubjects::TYPE_DEBIT; // debit:0
-                $this->registerProcessRun($debit_item, $user_id);
-            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new HttpResponseException(response()->json(["code" => Error::STOP_REGISTER_JOURNAL, 'message' => Error::getMessage(Error::STOP_REGISTER_JOURNAL)], 500));
         }
+
+        DB::commit();
     }
 
     public function registerProcessRun($params, $user_id)
@@ -103,55 +117,80 @@ class JournalRegisterService
         $result = $this->journal_register->getJournalUnit($request, $user_id);
 
         // フロント側で使用するようにデータをフォーマット
-        $data = [];
-        $data['unit_number'] = $result[0]->unit_number;
-        $data['account_date'] = $result[0]->account_date;
-        $data['ids'] = [];
+        $format_data = [
+            'unit_number' => '',
+            'account_date' => '',
+            'ids' => [],
+            'debit' => [],
+            'credit' =>  []
+        ];
+        $item_format = [
+            'account_subject_id' => '',
+            'summary' => '',
+            'amount' => '',
+            'add_info_id' => '',
+        ];
+
+        $format_data['unit_number'] = $result[0]->unit_number;
+        $format_data['account_date'] = $result[0]->account_date;
 
         $debit_item_count = 0;
         $credit_item_count = 0;
 
-        foreach ($result as $journal) {
+        foreach ($result as $key => $journal) {
+            // データの格納処理の回数が奇数回の場合、debitとcreditにitem_formatを追加する
+            if (($key + 1) % 2 !== 0) {
+                array_push($format_data['debit'], $item_format);
+                array_push($format_data['credit'], $item_format);
+            }
             if ($journal->journal_type === AccountSubjects::TYPE_DEBIT) {
-                array_push($data['ids'], $journal->id);
-                $data['debit'][$debit_item_count]['account_subject_id'] = $journal->account_subject_id;
-                $data['debit'][$debit_item_count]['summary'] = $journal->summary;
-                $data['debit'][$debit_item_count]['amount'] = $journal->amount;
-                $data['debit'][$debit_item_count]['add_info_id'] = "";
+                array_push($format_data['ids'], $journal->id);
+                $format_data['debit'][$debit_item_count]['account_subject_id'] = $journal->account_subject_id;
+                $format_data['debit'][$debit_item_count]['summary'] = $journal->summary;
+                $format_data['debit'][$debit_item_count]['amount'] = $journal->amount;
+                $format_data['debit'][$debit_item_count]['add_info_id'] = "";
 
                 if ($journal->bank_id !== null) {
-                    $data['debit'][$debit_item_count]['add_info_id'] = $journal->bank_id;
+                    $format_data['debit'][$debit_item_count]['add_info_id'] = $journal->bank_id;
                 }
                 if ($journal->supplier_id !== null) {
-                    $data['debit'][$debit_item_count]['add_info_id'] = $journal->supplier_id;
+                    $format_data['debit'][$debit_item_count]['add_info_id'] = $journal->supplier_id;
                 }
                 $debit_item_count++;
             } else {
-                array_push($data['ids'], $journal->id);
-                $data['credit'][$credit_item_count]['id'] = $journal->id;
-                $data['credit'][$credit_item_count]['account_subject_id'] = $journal->account_subject_id;
-                $data['credit'][$credit_item_count]['summary'] = $journal->summary;
-                $data['credit'][$credit_item_count]['amount'] = $journal->amount;
-                $data['credit'][$credit_item_count]['add_info_id'] = "";
+                array_push($format_data['ids'], $journal->id);
+                $format_data['credit'][$credit_item_count]['id'] = $journal->id;
+                $format_data['credit'][$credit_item_count]['account_subject_id'] = $journal->account_subject_id;
+                $format_data['credit'][$credit_item_count]['summary'] = $journal->summary;
+                $format_data['credit'][$credit_item_count]['amount'] = $journal->amount;
+                $format_data['credit'][$credit_item_count]['add_info_id'] = "";
 
                 if ($journal->bank_id !== null) {
-                    $data['credit'][$credit_item_count]['add_info_id'] = $journal->bank_id;
+                    $format_data['credit'][$credit_item_count]['add_info_id'] = $journal->bank_id;
                 }
                 if ($journal->supplier_id !== null) {
-                    $data['credit'][$credit_item_count]['add_info_id'] = $journal->supplier_id;
+                    $format_data['credit'][$credit_item_count]['add_info_id'] = $journal->supplier_id;
                 }
                 $credit_item_count++;
             }
         }
-        return $data;
+        return $format_data;
     }
 
     public function journalUpdate($request)
     {
-        foreach ($request->ids as $id) {
-            $this->journal_register->deleteJournals($id);
+        DB::beginTransaction();
+        try {
+            foreach ($request->ids as $id) {
+                $this->journal_register->deleteJournals($id);
+            }
+            $this->journalRegister($request);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new HttpResponseException(response()->json(["code" => Error::STOP_REGISTER_JOURNAL, 'message' => Error::getMessage(Error::STOP_REGISTER_JOURNAL)], 500));
         }
-        $this->journalRegister($request);
+
+        DB::commit();
     }
 
     public function journalDelete($request)

@@ -17,7 +17,6 @@ class JournalRegisterRepository implements JournalRegisterRepositoryInterface
     protected $accounts_receivable_book;
     protected $accounts_payable_book;
     protected $expense_book;
-    private $user_id;
     /**
      * 
      * @param model $journal, deposit_book
