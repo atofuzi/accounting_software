@@ -5,6 +5,7 @@ namespace App\Repositories\Record;
 use App\Models\Journal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Expr\FuncCall;
 
 class RecordRepository implements RecordRepositoryInterface
 {
@@ -51,5 +52,29 @@ class RecordRepository implements RecordRepositoryInterface
             ->get();
 
         return $result;
+    }
+
+    public function getCashRecord($params)
+    {
+    }
+
+    public function getDepositRecord($params)
+    {
+    }
+
+    public function getReceivableRecord($params)
+    {
+    }
+
+    public function getPayableRecord($params)
+    {
+    }
+
+    public function getExpensesRecord($params)
+    {
+    }
+
+    public function getTotalAccountRecord($params)
+    {
     }
 }

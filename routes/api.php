@@ -27,5 +27,12 @@ Route::middleware('auth:api')->get('journal_edit', 'JournalRegisterController@jo
 Route::middleware('auth:api')->post('journal_update', 'JournalRegisterController@journalUpdate');
 Route::middleware('auth:api')->put('journal_delete', 'JournalRegisterController@journalDelete');
 
+// 各帳票データ取得
 Route::middleware('auth:api')->get('/record_journal', 'RecordController@recordJournal');
+Route::middleware('auth:api')->get('/record_cash', 'RecordController@recordCash');
+Route::middleware('auth:api')->get('/record_deposit', 'RecordController@recordDeposit');
+Route::middleware('auth:api')->get('/record_receivable', 'RecordController@recordReceivable');
+Route::middleware('auth:api')->get('/record_payable', 'RecordController@recordPayable');
+Route::middleware('auth:api')->get('/record_expenses', 'RecordController@recordExpense');
+Route::middleware('auth:api')->get('/record_total_account', 'RecordController@recordTotalAccount');
 Route::middleware('auth:api')->get('/test', 'TestController@test');
