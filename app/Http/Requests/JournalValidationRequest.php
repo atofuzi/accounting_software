@@ -77,6 +77,7 @@ class JournalValidationRequest extends FormRequest
 
     public function withValidator(\Illuminate\Contracts\Validation\Validator $validator)
     {
+        if ($validator->fails()) return;
         $validator->sometimes('debit.0.add_info_id', 'required', function ($formData) {
             $result = false;
             if (in_array($formData['debit'][0]['account_subject_id'], $this->account_subjects->add_info_group)) {
