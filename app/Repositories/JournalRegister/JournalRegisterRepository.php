@@ -9,6 +9,7 @@ use App\Models\ExpenseBook;
 use App\Models\DepositAccountBook;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\AccountSubjects;
 
 class JournalRegisterRepository implements JournalRegisterRepositoryInterface
 {
@@ -40,18 +41,39 @@ class JournalRegisterRepository implements JournalRegisterRepositoryInterface
 
     public function insertJournals($params)
     {
-        $journal_id = $this->journal
-            ->insertGetId([
-                'unit_number' => $params['unit_number'],
-                'user_id' => $params['user_id'],
-                'account_date' => $params['account_date'],
-                'account_subject_id' => $params['account_subject_id'],
-                'summary' => $params['summary'],
-                'amount' => $params['amount'],
-                'journal_type' => $params['journal_type'],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
+        if ($params['journal_type'] === AccountSubjects::TYPE_DEBIT) {
+            $journal_id = $this->journal
+                ->insertGetId([
+                    'unit_number' => $params['unit_number'],
+                    'user_id' => $params['user_id'],
+                    'account_date' => $params['account_date'],
+                    'account_subject_id' => $params['account_subject_id'],
+                    'summary' => $params['summary'],
+                    'amount' => $params['amount'],
+                    'debit_amount' => $params['amount'],
+                    'credit_amount' => 0,
+                    'journal_type' => $params['journal_type'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+        } else if ($params['journal_type'] === AccountSubjects::TYPE_CREDIT) {
+            $journal_id = $this->journal
+                ->insertGetId([
+                    'unit_number' => $params['unit_number'],
+                    'user_id' => $params['user_id'],
+                    'account_date' => $params['account_date'],
+                    'account_subject_id' => $params['account_subject_id'],
+                    'summary' => $params['summary'],
+                    'amount' => $params['amount'],
+                    'debit_amount' => 0,
+                    'credit_amount' => $params['amount'],
+                    'journal_type' => $params['journal_type'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+        }
+
+
         return $journal_id;
     }
 
@@ -60,6 +82,7 @@ class JournalRegisterRepository implements JournalRegisterRepositoryInterface
         $bank_id = !empty($params['add_info_id']) ? $params['add_info_id'] : 1;
         $this->deposit_book->insert([
             'user_id' => $params['user_id'],
+            'unit_number' => $params['unit_number'],
             'journal_id' => $id,
             'bank_id' => $bank_id,
             'created_at' => Carbon::now(),
