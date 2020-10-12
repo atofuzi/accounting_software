@@ -23,9 +23,52 @@ class RecordController extends Controller
         $this->record_service = $record_service;
     }
 
+    // 仕訳帳データ取得
     public function recordJournal(Request $request)
     {
         $result = $this->record_service->journal($request);
+        return $result;
+    }
+
+    // 現金出納帳データ取得
+    public function recordCash(Request $request)
+    {
+        $result = $this->record_service->getCashRecord($request);
+        return $result;
+    }
+
+    // 預金出納帳データ取得
+    public function recordDeposit(Request $request)
+    {
+        $result = $this->record_service->getDepositRecord($request);
+        return $result;
+    }
+
+    // 売掛帳データ取得
+    public function recordReceivable(Request $request)
+    {
+        $result = $this->record_service->getReceivableRecord($request);
+        return $result;
+    }
+
+    // 買掛帳データ取得
+    public function recordPayable(Request $request)
+    {
+        $result = $this->record_service->getPayableRecord($request);
+        return $result;
+    }
+
+    // 経費帳データ取得
+    public function recordExpenses(Request $request)
+    {
+        $result = $this->record_service->getExpensesRecord($request);
+        return $result;
+    }
+
+    // 総勘定元帳データ取得
+    public function recordTotalAccount(Request $request)
+    {
+        $result = $this->record_service->getTotalAccountRecord($request);
         return $result;
     }
 }
