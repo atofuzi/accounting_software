@@ -8,7 +8,9 @@ use App\Models\DepositAccountBook;
 use App\Models\DepositBalance;
 use App\Models\AccountsReceivableBook;
 use App\Models\AccountsPayableBook;
+use App\Models\AccountSubject;
 use App\Models\ExpenseBook;
+use App\Enums\AccountSubjects;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
@@ -82,6 +84,42 @@ class RecordRepository implements RecordRepositoryInterface
 
     public function getCashRecord($params)
     {
+        $user_id = Auth::id();
+        // journalsテーブルから先月繰越残高を計算
+        $last_balance = $this->journal->selectRaw('sum(debit_amount) - sum(credit_amount) as balance')
+            ->where('user_id', $user_id)
+            ->where('account_subject_id', AccountSubjects::CASH)
+            ->where('account_date', '<', $params->date_from)
+            ->first();
+
+        $result['last_balance'] = (!empty($last_balance->balance)) ? $last_balance->balance : 0;
+
+        $cash_records = $this->journal->select('journal_type', 'unit_number')
+            ->where('user_id', $user_id)
+            ->where('account_subject_id', AccountSubjects::CASH)
+            ->where('account_date', '>=', $params->date_from)
+            ->where('account_date', '<', $params->date_to)
+            ->orderBy('account_date', 'asc')
+            ->get();
+
+        $result['items'] = [];
+        foreach ($cash_records as $key => $cash_record) {
+            $data = [
+                ':user_id' => $user_id,
+                ':unit_number' => $cash_record->unit_number,
+                ':journal_type' => $cash_record->journal_type,
+            ];
+
+            $record_date = DB::select("SELECT j.id, account_date, unit_number,
+                                                (CASE journal_type WHEN 0 THEN 1 WHEN 1 THEN 0 END) AS journal_type,
+                                                summary, a.account_subject as target_account_subject, amount
+                                            FROM journals as j INNER JOIN account_subjects as a  on j.account_subject_id = a.id 
+                                            WHERE user_id = :user_id AND unit_number = :unit_number AND journal_type <> :journal_type;", $data);
+
+            $data = json_decode(json_encode($record_date), true);
+            $result['items'][$key] = $data[0];
+        }
+        return $result;
     }
 
     public function getDepositRecord($params)
@@ -159,6 +197,66 @@ class RecordRepository implements RecordRepositoryInterface
 
     public function getExpensesRecord($params)
     {
+        $user_id = Auth::id();
+        $result = $this->journal->select('account_subject_id', 'account_subject as table_title')
+            ->selectRaw('sum(debit_amount) - sum(credit_amount) as last_balance')
+            ->join('expense_books', 'journals.id', '=', 'expense_books.journal_id')
+            ->join('account_subjects', 'journals.account_subject_id', '=', 'account_subjects.id')
+            ->where('journals.user_id', $user_id)
+            ->where('account_date', '<', $params->date_from)
+            ->groupBy('account_subject_id')
+            ->groupBy('account_subject')
+            ->orderBy('account_subject_id', 'asc')
+            ->get();
+        
+        if (!$result->isEmpty()) {
+            foreach($result as $key => $result_item){
+                $column = [
+                    'id',
+                    'account_date',
+                    'summary',
+                    'journal_type',
+                    'amount',
+                ];
+                $result[$key]['items'] = $this->journal->select($column)
+                                                        ->where('account_date', '>=', $params->date_from)
+                                                        ->where('account_date', '<', $params->date_to)
+                                                        ->where('user_id', $user_id)
+                                                        ->where('account_subject_id', $result_item['account_subject_id'])
+                                                        ->orderBy('account_date','asc')
+                                                        ->get();
+            }
+        } else {
+            $result = $this->journal->select('account_subject_id', 'account_subject as table_title')
+                                        ->join('expense_books', 'journals.id', '=', 'expense_books.journal_id')
+                                        ->join('account_subjects', 'journals.account_subject_id', '=', 'account_subjects.id')
+                                        ->where('journals.user_id', $user_id)
+                                        ->where('account_date', '>=', $params->date_from)
+                                        ->where('account_date', '<', $params->date_to)
+                                        ->groupBy('account_subject_id')
+                                        ->groupBy('account_subject')
+                                        ->orderBy('account_subject_id', 'asc')
+                                        ->get();
+            foreach ($result as $key => $result_item ) {
+                $column = [
+                    'id',
+                    'account_date',
+                    'summary',
+                    'journal_type',
+                    'amount',
+                ];
+                $result[$key]['items'] = $this->journal->select($column)
+                                                        ->where('account_date', '>=', $params->date_from)
+                                                        ->where('account_date', '<', $params->date_to)
+                                                        ->where('user_id', $user_id)
+                                                        ->where('account_subject_id', $result_item['account_subject_id'])
+                                                        ->orderBy('account_date','asc')
+                                                        ->get();
+                $result[$key]['last_balance'] = 0; 
+            }
+        }
+
+        return $result->toArray();
     }
 
     public function getTotalAccountRecord($params)

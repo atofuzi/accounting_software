@@ -37,6 +37,16 @@ class RecordService
     public function getCashRecord($params)
     {
         $data = $this->record->getCashRecord($params);
+
+        $data['total_balance'] = $data['last_balance'];
+        foreach ($data['items'] as $key => $cash_record) {
+            if ($cash_record['journal_type'] === AccountSubjects::TYPE_DEBIT) {
+                $data['items'][$key]['balance'] =  $data['total_balance'] + $cash_record['amount'];
+            } else if ($cash_record['journal_type'] === AccountSubjects::TYPE_CREDIT) {
+                $data['items'][$key]['balance'] =  $data['total_balance'] - $cash_record['amount'];
+            }
+            $data['total_balance'] = $data['items'][$key]['balance'];
+        }
         return $data;
     }
 
@@ -97,6 +107,20 @@ class RecordService
     public function getExpensesRecord($params)
     {
         $data = $this->record->getExpensesRecord($params);
+        // total_balanceとレコード毎のbalanceを計算する;
+        if(!empty($data)){
+            foreach ($data as $key => $expenses_record) {
+                $data[$key]['total_balance'] = $expenses_record['last_balance'];
+                foreach ($expenses_record['items'] as $index => $item) {
+                    if ($item['journal_type'] === AccountSubjects::TYPE_DEBIT) {
+                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
+                    } else {
+                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
+                    }
+                    $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
+                }
+            }
+        }
         return $data;
     }
 

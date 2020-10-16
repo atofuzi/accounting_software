@@ -33,6 +33,6 @@ Route::middleware('auth:api')->get('/record_cash', 'RecordController@recordCash'
 Route::middleware('auth:api')->get('/record_deposit', 'RecordController@recordDeposit');
 Route::middleware('auth:api')->get('/record_receivable', 'RecordController@recordReceivable');
 Route::middleware('auth:api')->get('/record_payable', 'RecordController@recordPayable');
-Route::middleware('auth:api')->get('/record_expenses', 'RecordController@recordExpense');
+Route::middleware('auth:api')->get('/record_expenses', 'RecordController@recordExpenses');
 Route::middleware('auth:api')->get('/record_total_account', 'RecordController@recordTotalAccount');
 Route::middleware('auth:api')->get('/test', 'TestController@test');

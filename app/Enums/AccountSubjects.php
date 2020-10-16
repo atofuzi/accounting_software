@@ -7,6 +7,7 @@ class AccountSubjects
     /**
      * 会計科目関係の定数
      */
+    const CASH = 1;
     const NORMAL_DEPOSIT = 2;
     const CURRENT_ACCOUNT = 3;
     const TIME_DEPOSIT = 4;
