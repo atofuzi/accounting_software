@@ -60,16 +60,8 @@ class RecordService
     {
         $data = $this->record->getDepositRecord($params);
         // total_balanceとレコード毎のbalanceを計算する
-        foreach ($data as $key => $deposit_record) {
-            $data[$key]['total_balance'] = $deposit_record['last_balance'];
-            foreach ($deposit_record['items'] as $index => $item) {
-                if ($item['journal_type'] === AccountSubjects::TYPE_DEBIT) {
-                    $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
-                } else {
-                    $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
-                }
-                $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
-            }
+        if(!empty($data)){
+            $data = $this->getBalanceAndTotalBalance($data);
         }
         return $data;
     }
@@ -83,6 +75,10 @@ class RecordService
     public function getReceivableRecord($params)
     {
         $data = $this->record->getReceivableRecord($params);
+        // total_balanceとレコード毎のbalanceを計算する;
+        if(!empty($data)){
+            $data = $this->getBalanceAndTotalBalance($data);
+        }
         return $data;
     }
 
@@ -95,6 +91,9 @@ class RecordService
     public function getPayableRecord($params)
     {
         $data = $this->record->getPayableRecord($params);
+        if(!empty($data)){
+            $data = $this->getBalanceAndTotalBalance($data);
+        }
         return $data;
     }
 
@@ -109,17 +108,7 @@ class RecordService
         $data = $this->record->getExpensesRecord($params);
         // total_balanceとレコード毎のbalanceを計算する;
         if(!empty($data)){
-            foreach ($data as $key => $expenses_record) {
-                $data[$key]['total_balance'] = $expenses_record['last_balance'];
-                foreach ($expenses_record['items'] as $index => $item) {
-                    if ($item['journal_type'] === AccountSubjects::TYPE_DEBIT) {
-                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
-                    } else {
-                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
-                    }
-                    $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
-                }
-            }
+            $data = $this->getBalanceAndTotalBalance($data);
         }
         return $data;
     }
@@ -133,6 +122,21 @@ class RecordService
     public function getTotalAccountRecord($params)
     {
         $data = $this->record->getTotalAccountRecord($params);
+        return $data;
+    }
+
+    public function getBalanceAndTotalBalance($data){
+        foreach ($data as $key => $expenses_record) {
+            $data[$key]['total_balance'] = $expenses_record['last_balance'];
+            foreach ($expenses_record['items'] as $index => $item) {
+                if ($item['journal_type'] === AccountSubjects::TYPE_DEBIT) {
+                    $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
+                } else {
+                    $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
+                }
+                $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
+            }
+        }
         return $data;
     }
 }
