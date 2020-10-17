@@ -146,7 +146,7 @@ class JournalRegisterRepository implements JournalRegisterRepositoryInterface
             ->leftJoin('accounts_payable_books', 'journals.id', '=', 'accounts_payable_books.journal_id')
             ->leftJoin('accounts_receivable_books', 'journals.id', '=', 'accounts_receivable_books.journal_id')
             ->where('journals.user_id', '=', $id)
-            ->where('unit_number', '=', $params['unit_number'])
+            ->where('journals.unit_number', '=', $params['unit_number'])
             ->orderBy('journals.id', 'asc')
             ->get();
 
