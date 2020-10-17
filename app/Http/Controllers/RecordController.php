@@ -65,10 +65,31 @@ class RecordController extends Controller
         return $result;
     }
 
-    // 総勘定元帳データ取得
-    public function recordTotalAccount(Request $request)
+    // 総勘定元帳（資産）データ取得
+    public function recordTotalAssets(Request $request)
     {
-        $result = $this->record_service->getTotalAccountRecord($request);
+        $result = $this->record_service->getTotalAssetsRecord($request);
+        return $result;
+    }
+
+    // 総勘定元帳（負債・資本）データ取得
+    public function recordTotalLiabilitiesAndCapital(Request $request)
+    {
+        $result = $this->record_service->getTotalLiabilitiesAndCapitalRecord($request);
+        return $result;
+    }
+
+    // 総勘定元帳（経費）データ取得
+    public function recordTotalExpenses(Request $request)
+    {
+        $result = $this->record_service->getTotalExpensesRecord($request);
+        return $result;
+    }
+
+    // 総勘定元帳（経費）データ取得
+    public function recordTotalEarnings(Request $request)
+    {
+        $result = $this->record_service->getTotalEarningsRecord($request);
         return $result;
     }
 }

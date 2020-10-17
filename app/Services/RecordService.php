@@ -114,29 +114,106 @@ class RecordService
     }
 
     /**
-     * 総勘定元帳データ一覧取得
+     * 総勘定元帳（資産）データ一覧取得
      * 
      * @param 
      * @return array
      */
-    public function getTotalAccountRecord($params)
+    public function getTotalAssetsRecord($params)
     {
-        $data = $this->record->getTotalAccountRecord($params);
+        $data = $this->record->getTotalAssetsRecord($params);
+        // total_balanceとレコード毎のbalanceを計算する;
+        if(!empty($data)){
+            $data = $this->getBalanceAndTotalBalance($data);
+        }
         return $data;
     }
 
-    public function getBalanceAndTotalBalance($data){
-        foreach ($data as $key => $expenses_record) {
-            $data[$key]['total_balance'] = $expenses_record['last_balance'];
-            foreach ($expenses_record['items'] as $index => $item) {
-                if ($item['journal_type'] === AccountSubjects::TYPE_DEBIT) {
-                    $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
-                } else {
-                    $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
+
+    /**
+     * 総勘定元帳（負債・資本）データ一覧取得
+     * 
+     * @param 
+     * @return array
+     */
+    public function getTotalLiabilitiesAndCapitalRecord($params)
+    {
+        $data = $this->record->getTotalLiabilitiesAndCapitalRecord($params);
+        // total_balanceとレコード毎のbalanceを計算する;
+        if(!empty($data)){
+            $data = $this->getBalanceAndTotalBalance($data, 'credit');
+        }
+        return $data;
+    }
+
+
+    /**
+     * 総勘定元帳（経費）データ一覧取得
+     * 
+     * @param 
+     * @return array
+     */
+    public function getTotalExpensesRecord($params)
+    {
+        $data = $this->record->getTotalExpensesRecord($params);
+        if(!empty($data)){
+            $data['total_balance'] = $data['last_balance'];
+            foreach ($data['items'] as $key => $cash_record) {
+                if ($cash_record['journal_type'] === AccountSubjects::TYPE_DEBIT) {
+                    $data['items'][$key]['balance'] =  $data['total_balance'] + $cash_record['amount'];
+                } else if ($cash_record['journal_type'] === AccountSubjects::TYPE_CREDIT) {
+                    $data['items'][$key]['balance'] =  $data['total_balance'] - $cash_record['amount'];
                 }
-                $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
+                $data['total_balance'] = $data['items'][$key]['balance'];
             }
         }
+        return $data;
+    }
+
+    /**
+     * 総勘定元帳（売上）データ一覧取得
+     * 
+     * @param 
+     * @return array
+     */
+    public function getTotalEarningsRecord($params)
+    {
+        $data = $this->record->getTotalEarningsRecord($params);
+        // total_balanceとレコード毎のbalanceを計算する;
+        if(!empty($data)){
+            $data = $this->getBalanceAndTotalBalance($data, 'credit');
+        }
+        return $data;
+    }
+
+
+    public function getBalanceAndTotalBalance($data, $asset_type = null){
+        if (empty($asset_type)) { 
+            foreach ($data as $key => $record) {
+                $data[$key]['total_balance'] = $record['last_balance'];
+                foreach ($record['items'] as $index => $item) {
+                    if ($item['journal_type'] === AccountSubjects::TYPE_DEBIT) {
+                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
+                    } else {
+                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
+                    }
+                    $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
+                }
+            }
+        } else {
+            foreach ($data as $key => $record) {
+                $data[$key]['total_balance'] = $record['last_balance'];
+                foreach ($record['items'] as $index => $item) {
+                    if ($item['journal_type'] === AccountSubjects::TYPE_CREDIT) {
+                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] + $item['amount'];
+                    } else {
+                        $data[$key]['items'][$index]['balance'] = $data[$key]['total_balance'] - $item['amount'];
+                    }
+                    $data[$key]['total_balance'] =  $data[$key]['items'][$index]['balance'];
+                }
+            }
+        }
+        
         return $data;
     }
 }

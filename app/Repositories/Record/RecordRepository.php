@@ -24,6 +24,7 @@ class RecordRepository implements RecordRepositoryInterface
     protected $receivable;
     protected $payable;
     protected $expenses;
+    protected $account_subjects;
 
     /**
      * 
@@ -36,7 +37,8 @@ class RecordRepository implements RecordRepositoryInterface
         AccountsReceivableBook $receivable,
         AccountsPayableBook $payable,
         ExpenseBook $expenses,
-        DepositBalance $deposit_balance
+        DepositBalance $deposit_balance,
+        AccountSubject $account_subjects
     ) {
         $this->journal = $journal;
         $this->cash = $cash;
@@ -45,6 +47,7 @@ class RecordRepository implements RecordRepositoryInterface
         $this->payable = $payable;
         $this->expenses = $expenses;
         $this->deposit_balance = $deposit_balance;
+        $this->account_subjects = $account_subjects;
     }
 
     /**
@@ -293,7 +296,7 @@ class RecordRepository implements RecordRepositoryInterface
 
         // 先月の取引先id,取引先名,残高情報を取得
         $last_month_suppliers = $this->payable->select('supplier_id as id', 'suppliers.supplier_name')
-            ->selectRaw('sum(debit_amount) - sum(credit_amount) as last_balance')
+            ->selectRaw('sum(credit_amount) - sum(debit_amount) as last_balance')
             ->join('journals', 'accounts_payable_books.journal_id', '=', 'journals.id')
             ->join('suppliers', 'accounts_payable_books.supplier_id', '=', 'suppliers.id')
             ->where('accounts_payable_books.user_id', $user_id)
@@ -423,9 +426,303 @@ class RecordRepository implements RecordRepositoryInterface
         return $result;
     }
 
-    public function getTotalAccountRecord($params)
+    public function getTotalAssetsRecord($params)
     {
+        $user_id = Auth::id();
+        // 資産に該当する科目をグループ化して科目id,科目名,先月残高を取得する
+        $column = [
+            'journals.account_subject_id as id',
+            'account_subject' ,
+            'gentian_number',
+        ];
+
+        $last_total_assets = $this->account_subjects
+                                    ->select($column)
+                                    ->selectRaw('sum(debit_amount) - sum(credit_amount) as last_balance')
+                                    ->join('journals', 'account_subjects.id', '=', 'journals.account_subject_id')
+                                    ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                    ->where('account_subjects.bs_pl_type', '資産')
+                                    ->where('journals.user_id', $user_id)
+                                    ->where('journals.account_date', '<', $params->date_from)
+                                    ->groupBy('journals.account_subject_id')
+                                    ->groupBy('account_subject')
+                                    ->groupBy('gentian_number')
+                                    ->orderBy('journals.account_subject_id')
+                                    ->get();
+        
+        
+        $current_total_assets = $this->account_subjects
+                                    ->select($column)
+                                    ->selectRaw('0 as last_balance')
+                                    ->join('journals', 'account_subjects.id', '=', 'journals.account_subject_id')
+                                    ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                    ->where('account_subjects.bs_pl_type', '資産')
+                                    ->where('journals.user_id', $user_id)
+                                    ->where('journals.account_date', '>=', $params->date_from)
+                                    ->where('journals.account_date', '<', $params->date_to)
+                                    ->groupBy('journals.account_subject_id')
+                                    ->groupBy('account_subject')
+                                    ->groupBy('gentian_number')
+                                    ->orderBy('journals.account_subject_id')
+                                    ->get();
+        
+    
+        // 取得データを比較し、パターン判定
+        $case = $this->get_record_case($last_total_assets, $current_total_assets);
+        // 返却データ格納用配列
+        $result = [];
+
+        switch($case){
+            case 1: // 両方とも無し
+                return $result;
+                break;
+            case 2: // 先月まで無し、今月有り
+                foreach ($current_total_assets as $key => $asset) {
+                    $result[$key]['table_title'] = $asset['account_subject'];
+                    $result[$key]['last_balance'] = $asset['last_balance'];
+                    $result[$key]['items'] = $this->getTotalRecordItems($user_id, $params, $asset);
+                }
+                break;
+            case 3: // 先月まで有り、今月無し
+                foreach ($last_total_assets as $key => $asset) {
+                    $result[$key]['table_title'] = $asset['account_subject'];
+                    $result[$key]['last_balance'] = $asset['last_balance'];
+                    $result[$key]['items'] = [];
+                }
+                break;
+            case 4: // 先月まで有り、今月も有り
+                $new_assets = $this->array_map(['id'], $current_total_assets);
+                $old_assets = $this->array_map(['id'], $last_total_assets);
+                // 先月までのデータに今月のデータを結合する
+                // 差分だけ追加する
+                $assets = array_values($old_assets + $new_assets);
+
+                foreach ($assets as $key => $asset) {
+                    $result[$key]['table_title'] = $asset['account_subject'];
+                    $result[$key]['last_balance'] = $asset['last_balance'];
+                    $result[$key]['items'] = $this->getTotalRecordItems($user_id, $params, $asset);
+                }
+                break;
+        }
+        return $result;
     }
+
+    public function getTotalLiabilitiesAndCapitalRecord($params)
+    {
+        $user_id = Auth::id();
+        // 負債・資本に該当する科目をグループ化して科目id,科目名,先月残高を取得する
+        $column = [
+            'journals.account_subject_id as id',
+            'account_subject' ,
+            'gentian_number',
+        ];
+
+        $last_total_liabilities_capitals = $this->account_subjects
+                                    ->select($column)
+                                    ->selectRaw('sum(credit_amount) - sum(debit_amount) as last_balance')
+                                    ->join('journals', 'account_subjects.id', '=', 'journals.account_subject_id')
+                                    ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                    ->whereIn('account_subjects.bs_pl_type', ['負債', '資本'])
+                                    ->where('journals.user_id', $user_id)
+                                    ->where('journals.account_date', '<', $params->date_from)
+                                    ->groupBy('journals.account_subject_id')
+                                    ->groupBy('account_subject')
+                                    ->groupBy('gentian_number')
+                                    ->orderBy('journals.account_subject_id')
+                                    ->get();
+        
+        
+        $current_total_liabilities_capitals = $this->account_subjects
+                                    ->select($column)
+                                    ->selectRaw('0 as last_balance')
+                                    ->join('journals', 'account_subjects.id', '=', 'journals.account_subject_id')
+                                    ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                    ->whereIn('account_subjects.bs_pl_type', ['負債', '資本'])
+                                    ->where('journals.user_id', $user_id)
+                                    ->where('journals.account_date', '>=', $params->date_from)
+                                    ->where('journals.account_date', '<', $params->date_to)
+                                    ->groupBy('journals.account_subject_id')
+                                    ->groupBy('account_subject')
+                                    ->groupBy('gentian_number')
+                                    ->orderBy('journals.account_subject_id')
+                                    ->get();
+        
+    
+        // 取得データを比較し、パターン判定
+        $case = $this->get_record_case($last_total_liabilities_capitals, $current_total_liabilities_capitals);
+        // 返却データ格納用配列
+        $result = [];
+
+        switch($case){
+            case 1: // 両方とも無し
+                return $result;
+                break;
+            case 2: // 先月まで無し、今月有り
+                foreach ($current_total_liabilities_capitals as $key => $liabilities_capital) {
+                    $result[$key]['table_title'] = $liabilities_capital['account_subject'];
+                    $result[$key]['last_balance'] = $liabilities_capital['last_balance'];
+                    $result[$key]['items'] = $this->getTotalRecordItems($user_id, $params, $liabilities_capital);
+                }
+                break;
+            case 3: // 先月まで有り、今月無し
+                foreach ($last_total_liabilities_capitals as $key => $liabilities_capital) {
+                    $result[$key]['table_title'] = $liabilities_capital['account_subject'];
+                    $result[$key]['last_balance'] = $liabilities_capital['last_balance'];
+                    $result[$key]['items'] = [];
+                }
+                break;
+            case 4: // 先月まで有り、今月も有り
+                $new_liabilities_capitals = $this->array_map(['id'], $current_total_liabilities_capitals);
+                $old_liabilities_capitals = $this->array_map(['id'], $last_total_liabilities_capitals);
+                // 先月までのデータに今月のデータを結合する
+                // 差分だけ追加する
+                $liabilities_capitals = array_values($old_liabilities_capitals + $new_liabilities_capitals);
+
+                foreach ($liabilities_capitals  as $key => $liabilities_capital) {
+                    $result[$key]['table_title'] = $liabilities_capital['account_subject'];
+                    $result[$key]['last_balance'] = $liabilities_capital['last_balance'];
+                    $result[$key]['items'] = $this->getTotalRecordItems($user_id, $params, $liabilities_capital);
+                }
+                break;
+        }
+        return $result;
+    }
+
+    public function getTotalExpensesRecord($params)
+    {
+        $user_id = Auth::id();
+        // journalsテーブルから今月のデータを取得計算
+        $last_amount = $this->journal
+                                ->selectRaw('sum(debit_amount) - sum(credit_amount) as balance')
+                                ->join('expense_books', 'journals.id', '=', 'expense_books.journal_id')
+                                ->join('account_subjects', 'journals.account_subject_id', '=', 'account_subjects.id')
+                                ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                ->where('account_subjects.bs_pl_type', '経費')
+                                ->where('expense_books.user_id', $user_id)
+                                ->where('account_date', '<', $params->date_from)
+                                ->first();
+        
+        $current_amount = $this->journal
+                                ->selectRaw('sum(debit_amount) - sum(credit_amount) as balance')
+                                ->join('expense_books', 'journals.id', '=', 'expense_books.journal_id')
+                                ->join('account_subjects', 'journals.account_subject_id', '=', 'account_subjects.id')
+                                ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                ->where('account_subjects.bs_pl_type', '経費')
+                                ->where('expense_books.user_id', $user_id)
+                                ->where('account_date', '>=', $params->date_from)
+                                ->where('account_date', '<', $params->date_to)
+                                ->first();
+
+        $result = [];
+        $column = [
+            'journals.id',
+            'account_date',
+            'summary',
+            'journal_type',
+            'amount',
+        ];
+        if(empty($last_amount->balance) && empty($current_amount->balance)){
+            return $result;
+        } else if(empty($last_amount->balance) && !empty($current_amount->balance)) {
+            $result['table_title'] = '経費';
+            $result['gentians_number'] = AccountSubjects::GENTIAN_NUMBER['expenses'];
+            $result['last_balance'] = 0;
+            $result['items'] = $this->getTotalExpensesRecordItems($user_id, $params);
+        } else if(!empty($last_amount->balance) && empty($current_amount->balance)) {
+            $result['table_title'] = '経費';
+            $result['gentians_number'] = AccountSubjects::GENTIAN_NUMBER['expenses'];
+            $result['last_balance'] = $last_amount->balance;
+            $result['items'] = [];
+        } else {
+            $result['table_title'] = '経費';
+            $result['gentians_number'] = AccountSubjects::GENTIAN_NUMBER['expenses'];
+            $result['last_balance'] = $last_amount->balance;
+            $result['items'] = $this->getTotalExpensesRecordItems($user_id, $params);
+        }
+        return $result;
+    }
+
+    public function getTotalEarningsRecord($params)
+    {
+        $user_id = Auth::id();
+        // 負債・資本に該当する科目をグループ化して科目id,科目名,先月残高を取得する
+        $column = [
+            'journals.account_subject_id as id',
+            'account_subject' ,
+            'gentian_number',
+        ];
+        
+        $last_total_earnings = $this->account_subjects
+                                    ->select($column)
+                                    ->selectRaw('sum(credit_amount) - sum(debit_amount) as last_balance')
+                                    ->join('journals', 'account_subjects.id', '=', 'journals.account_subject_id')
+                                    ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                    ->where('account_subjects.bs_pl_type', '売上')
+                                    ->where('journals.user_id', $user_id)
+                                    ->where('journals.account_date', '<', $params->date_from)
+                                    ->groupBy('journals.account_subject_id')
+                                    ->groupBy('account_subject')
+                                    ->groupBy('gentian_number')
+                                    ->orderBy('journals.account_subject_id')
+                                    ->get();
+        
+        
+        $current_total_earnings = $this->account_subjects
+                                    ->select($column)
+                                    ->selectRaw('0 as last_balance')
+                                    ->join('journals', 'account_subjects.id', '=', 'journals.account_subject_id')
+                                    ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                                    ->where('account_subjects.bs_pl_type', '売上')
+                                    ->where('journals.user_id', $user_id)
+                                    ->where('journals.account_date', '>=', $params->date_from)
+                                    ->where('journals.account_date', '<', $params->date_to)
+                                    ->groupBy('journals.account_subject_id')
+                                    ->groupBy('account_subject')
+                                    ->groupBy('gentian_number')
+                                    ->orderBy('journals.account_subject_id')
+                                    ->get();
+        
+    
+        // 取得データを比較し、パターン判定
+        $case = $this->get_record_case($last_total_earnings, $current_total_earnings);
+        // 返却データ格納用配列
+        $result = [];
+
+        switch($case){
+            case 1: // 両方とも無し
+                return $result;
+                break;
+            case 2: // 先月まで無し、今月有り
+                foreach ($current_total_earnings as $key => $earnings) {
+                    $result[$key]['table_title'] = $earnings['account_subject'];
+                    $result[$key]['last_balance'] = $earnings['last_balance'];
+                    $result[$key]['items'] = $this->getTotalRecordItems($user_id, $params, $earnings);
+                }
+                break;
+            case 3: // 先月まで有り、今月無し
+                foreach ($last_total_earnings as $key => $earnings) {
+                    $result[$key]['table_title'] = $earnings['account_subject'];
+                    $result[$key]['last_balance'] = $earnings['last_balance'];
+                    $result[$key]['items'] = [];
+                }
+                break;
+            case 4: // 先月まで有り、今月も有り
+                $new_earnings = $this->array_map(['id'], $current_total_earnings);
+                $old_earnings = $this->array_map(['id'], $last_total_earnings);
+                // 先月までのデータに今月のデータを結合する
+                // 差分だけ追加する
+                $earnings = array_values($old_earnings + $new_earnings);
+
+                foreach ($earnings  as $key => $earning) {
+                    $result[$key]['table_title'] = $earning['account_subject'];
+                    $result[$key]['last_balance'] = $earning['last_balance'];
+                    $result[$key]['items'] = $this->getTotalRecordItems($user_id, $params, $earning);
+                }
+                break;
+        }
+        return $result;
+    }
+
 
     /**預金出納帳の先月末残取得
      * 
@@ -542,6 +839,48 @@ class RecordRepository implements RecordRepositoryInterface
             ->where('account_subject_id', $expenses['id'])
             ->orderBy('account_date', 'asc')
             ->get();
+
+        return $result;
+    }
+
+    public function getTotalRecordItems($user_id, $params, $record){
+        $column = [
+            'journals.id',
+            'account_date',
+            'summary',
+            'journal_type',
+            'amount',
+        ];
+        $result = $this->journal->select($column)
+            ->where('account_date', '>=', $params->date_from)
+            ->where('account_date', '<', $params->date_to)
+            ->where('user_id', $user_id)
+            ->where('account_subject_id', $record['id'])
+            ->orderBy('account_date', 'asc')
+            ->get();
+
+        return $result;
+    }
+
+    public function getTotalExpensesRecordItems($user_id, $params){
+        $column = [
+            'journals.id',
+            'account_date',
+            'summary',
+            'journal_type',
+            'amount',
+        ];
+
+        $result = $this->journal
+                        ->select($column)
+                        ->join('expense_books', 'journals.id', '=', 'expense_books.journal_id')
+                        ->join('account_subjects', 'journals.account_subject_id', '=', 'account_subjects.id')
+                        ->join('gentians', 'account_subjects.id', '=', 'gentians.account_subject_id')
+                        ->where('account_subjects.bs_pl_type', '経費')
+                        ->where('expense_books.user_id', $user_id)
+                        ->where('account_date', '>=', $params->date_from)
+                        ->where('account_date', '<', $params->date_to)
+                        ->get();
 
         return $result;
     }

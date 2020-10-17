@@ -52,10 +52,35 @@ interface RecordRepositoryInterface
     public function getExpensesRecord($params);
 
     /**
-     * 総勘定元帳データ取得
+     * 総勘定元帳（資産）データ取得
      * 
      * @var array $params
      * @return array 
      */
-    public function getTotalAccountRecord($params);
+    public function getTotalAssetsRecord($params);
+
+    /**
+     * 総勘定元帳（負債・資本）データ取得
+     * 
+     * @var array $params
+     * @return array 
+     */
+    public function getTotalLiabilitiesAndCapitalRecord($params);
+
+    /**
+     * 総勘定元帳（経費）データ取得
+     * 
+     * @var array $params
+     * @return array 
+     */
+    public function getTotalExpensesRecord($params);
+
+    /**
+     * 総勘定元帳（売上）データ取得
+     * 
+     * @var array $params
+     * @return array 
+     */
+    public function getTotalEarningsRecord($params);
+
 }

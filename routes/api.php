@@ -34,5 +34,9 @@ Route::middleware('auth:api')->get('/record_deposit', 'RecordController@recordDe
 Route::middleware('auth:api')->get('/record_receivable', 'RecordController@recordReceivable');
 Route::middleware('auth:api')->get('/record_payable', 'RecordController@recordPayable');
 Route::middleware('auth:api')->get('/record_expenses', 'RecordController@recordExpenses');
-Route::middleware('auth:api')->get('/record_total_account', 'RecordController@recordTotalAccount');
+Route::middleware('auth:api')->get('/record_total_assets', 'RecordController@recordTotalAssets');
+Route::middleware('auth:api')->get('/record_total_liabilities_capital', 'RecordController@recordTotalLiabilitiesAndCapital');
+Route::middleware('auth:api')->get('/record_total_expenses', 'RecordController@recordTotalExpenses');
+Route::middleware('auth:api')->get('/record_total_earnings', 'RecordController@recordTotalEarnings');
+//Route::middleware('auth:api')->get('/record_total_account', 'RecordController@recordTotalAccount');
 Route::middleware('auth:api')->get('/test', 'TestController@test');

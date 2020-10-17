@@ -39,4 +39,9 @@ class AccountSubjects
         self::TIME_DEPOSIT,
         self::OTHER_DEPOSIT,
     ];
+
+    // 元丁番号
+    const GENTIAN_NUMBER = [
+        'expenses' => 53,
+    ];
 }
