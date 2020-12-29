@@ -73,7 +73,7 @@ interface RecordRepositoryInterface
      * @var array $params
      * @return array 
      */
-    public function getTotalExpensesRecord($params);
+    public function getTotalCostRecord($params);
 
     /**
      * 総勘定元帳（売上）データ取得

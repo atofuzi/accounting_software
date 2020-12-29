@@ -153,19 +153,12 @@ class RecordService
      * @param 
      * @return array
      */
-    public function getTotalExpensesRecord($params)
+    public function getTotalCostRecord($params)
     {
-        $data = $this->record->getTotalExpensesRecord($params);
+        $data = $this->record->getTotalCostRecord($params);
+        // total_balanceとレコード毎のbalanceを計算する;
         if(!empty($data)){
-            $data['total_balance'] = $data['last_balance'];
-            foreach ($data['items'] as $key => $cash_record) {
-                if ($cash_record['journal_type'] === AccountSubjects::TYPE_DEBIT) {
-                    $data['items'][$key]['balance'] =  $data['total_balance'] + $cash_record['amount'];
-                } else if ($cash_record['journal_type'] === AccountSubjects::TYPE_CREDIT) {
-                    $data['items'][$key]['balance'] =  $data['total_balance'] - $cash_record['amount'];
-                }
-                $data['total_balance'] = $data['items'][$key]['balance'];
-            }
+            $data = $this->getBalanceAndTotalBalance($data);
         }
         return $data;
     }

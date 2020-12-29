@@ -79,10 +79,10 @@ class RecordController extends Controller
         return $result;
     }
 
-    // 総勘定元帳（経費）データ取得
-    public function recordTotalExpenses(Request $request)
+    // 総勘定元帳（経費・原価）データ取得
+    public function recordTotalCost(Request $request)
     {
-        $result = $this->record_service->getTotalExpensesRecord($request);
+        $result = $this->record_service->getTotalCostRecord($request);
         return $result;
     }
 
