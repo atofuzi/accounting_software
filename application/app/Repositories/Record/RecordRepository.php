@@ -14,6 +14,7 @@ use App\Enums\AccountSubjects;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
+use Illuminate\Support\Facades\Log;
 
 class RecordRepository implements RecordRepositoryInterface
 {
@@ -174,7 +175,6 @@ class RecordRepository implements RecordRepositoryInterface
                 return $result;
                 break;
             case 2: // 先月まで無し、今月有り
-                //return "// 先月まで無し、今月有り";
                 foreach ($current_month_deposits as $key => $deposit) {
                     $result[$key]['bank_name'] = $deposit['bank_name'];
                     $result[$key]['deposit_kind'] = $deposit['deposit_kind'];
@@ -791,10 +791,36 @@ class RecordRepository implements RecordRepositoryInterface
 
     public function getDepositRecordItems($user_id, $params, $deposit)
     {
+        /*
+            預金出納帳で表示するレコードを作成
+            仕訳の相手科目を取得するために、ユニット番号で相手のレコードを取得し、journal_typeを逆転して表示する必要がある
+            
+            journal_type：0 => 借方
+            journal_type：1 => 貸方
+
+            例1）
+            借方（自分）      | 貸方（相手）
+            普通預金：12,000  | 売掛金：10,000
+                            | 売上：2,000
+    
+            →相手側の売掛金と売上を預金出納帳の借方に表示する必要がある
+
+            例2）
+            借方(相手)        | 貸方(相手)
+            普通預金：12,000  | 売掛金：12,500
+            手数料：500       | 
+            →売掛金:12,500円を預金出納帳の借方に、手数料:500円は貸方に表示する必要がある
+
+        */
         $column = [
+            'journals.id',
             'journals.unit_number',
-            'journals.journal_type',
+            'account_date',
+            'summary',
+            'journals.journal_type as my_journal_type',
+            'amount',
         ];
+
         $result_column = [
             'journals.id',
             'journals.unit_number',
@@ -803,6 +829,7 @@ class RecordRepository implements RecordRepositoryInterface
             'account_subjects.account_subject as target_account_subject',
             'amount',
         ];
+
         $deposit_record_lists = $this->deposit
             ->select($column)
             ->join('journals', 'deposit_account_books.journal_id', '=', 'journals.id')
@@ -815,16 +842,21 @@ class RecordRepository implements RecordRepositoryInterface
             ->get();
 
         $result = [];
-        foreach ($deposit_record_lists as  $deposit_record) {
-            $target_account_type = ($deposit_record->journal_type === 0) ? 1 : 0;
 
+        foreach ($deposit_record_lists as $deposit_record) {
+
+            /*
+                ユニット番号から、自身とセットになっているレコードを取得する（自分は除く）
+                journal_typeは逆にしている（0→1,1→0）
+            */
             $items = $this->journal
                 ->select($result_column)
                 ->selectRaw("(CASE journal_type WHEN 0 THEN 1 WHEN 1 THEN 0 END) AS journal_type")
                 ->join('account_subjects', 'journals.account_subject_id', '=', 'account_subjects.id')
                 ->where('unit_number', $deposit_record->unit_number)
-                ->where('journal_type', $target_account_type)
+                ->where('journals.id', '<>', $deposit_record->id)
                 ->get();
+
             foreach ($items as $item) {
                 array_push($result, $item);
             }
