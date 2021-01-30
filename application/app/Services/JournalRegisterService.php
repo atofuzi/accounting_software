@@ -71,7 +71,7 @@ class JournalRegisterService
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new HttpResponseException(response()->json(["code" => Error::STOP_REGISTER_JOURNAL, 'message' => Error::getMessage(Error::STOP_REGISTER_JOURNAL)], 500));
+            throw new HttpResponseException(response()->json(["code" => 500, 'message' => $e->getMessage()], 500));
         }
 
         DB::commit();

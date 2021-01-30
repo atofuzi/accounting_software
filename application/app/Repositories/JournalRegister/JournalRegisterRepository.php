@@ -116,7 +116,7 @@ class JournalRegisterRepository implements JournalRegisterRepositoryInterface
 
     public function insertExpenseBooks($params, $id)
     {
-        $this->expenseBook->insert([
+        $this->expense_book->insert([
             'user_id' => $params['user_id'],
             'journal_id' => $id,
             'created_at' => Carbon::now(),
