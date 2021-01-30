@@ -7,7 +7,7 @@ ENV TZ Asia/Tokyo
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     COMPOSER_HOME=/composer
 
-COPY --from=composer:1.9.1 /usr/bin/composer /usr/bin/compos
+COPY --from=composer:1.9.1 /usr/bin/composer /usr/bin/composer
 
 RUN set -ex apk --no-cache add postgresql-dev libpq-dev
 RUN apt-get update && \

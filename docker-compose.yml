@@ -9,8 +9,11 @@ services:
     container_name: moma-api
     networks:
       - moma-network
+    ports:
+      - 9000:9000
     volumes:
       - ./application:/var/www/
+      - ./docker/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
     restart: always
     environment:
       - APP_ENV=local
@@ -37,6 +40,11 @@ services:
       POSTGRES_PASSWORD:
       POSTGRES_DB: moma
       POSTGRES_HOST_AUTH_METHOD: trust
+    command: postgres -c log_destination=stderr -c log_statement=all -c log_connections=on -c log_disconnections=on
+    logging:
+      options:
+        max-size: "10k"
+        max-file: "5"
 
 networks:
   moma-network:
